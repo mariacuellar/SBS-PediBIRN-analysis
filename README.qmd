@@ -11,7 +11,7 @@ format:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Testing
+# SBS PediBIRN replication study 
 
 ```{r load-data, echo=FALSE, include=FALSE}
 
@@ -23,3 +23,37 @@ library(usmap)
 library(readxl)
 
 ```
+
+
+# Data description
+
+This data was sent to me by Christopher Bryan Brook.
+
+Message from Chris about the data:
+
+> I have 420 cases from the pediBIRN data, which is the data used in Hymel et al. and Boos et al. articles. I find the Boos 2022 (attached) article interesting, where they do clustering analysis using a Gower matrix, and find 2 clusters. The outcomes in Table 1 are, IMO, very interesting. Of course, unsupervised clustering then requires interpretation and they interpret cluster 1 as AHT, because it has RH and SDH etc. But it is cluster 2 that actually has evidence of trauma. The interesting part is how severity of intracranial pathology (Loss of consciousness with deterioration) and hypoxia dominate Cluster 1.
+
+> I also attach Boos 2025 which is an example of misuse of statistics, not just misinterpretation. They use mediator analysis (and multivariate analysis) using outcomes (Loss of consciousness and SDH), but they  label those outcomes as exposures (inertial force) and treat them in the analysis as though they were exposures. So they use an outcome as a "proxy" for an exposure then treat the outcome as an exposure in the analysis.  It is shocking and the statistician in the team should be ashamed.
+
+> Anyway, what I have been doing is using Latent Class Analysis on the data Using 2 classes, I more or less reproduce Boos 2022 clustering although the size of split is a bit different the characteristics are the same. I then run it with 3 classes and get very interesting result where the 3 classes are basically determined by the 3 levels of loss of consciousness—1. none, 2. < 24 hours, 3. > 24 hours (with or without deterioration).
+
+> The rates of RH and SDH then increase between the 3 classes. So this can explain the correlation and support the assertion that these are just markers of degree of intracranial pathology.
+
+> If you have any experience in LCA, I would love some feedback on what I have done. I can send the results and details. I am still in the skeptical stage of these results and am trying to see if I missed something or did something wrong or if the results are somehow my wishful thinking materialising from dodgy analysis...
+
+
+
+
+```{r}
+# load data
+library(readxl)
+dat_control <- read_excel("Data/Data.xlsx", sheet = 2)
+dat_treatment <- read_excel("Data/Data.xlsx", sheet = 3)
+```
+
+```{r}
+names(dat_control)
+names(dat_treatment)
+```
+
+
