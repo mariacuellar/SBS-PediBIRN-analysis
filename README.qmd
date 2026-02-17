@@ -1,0 +1,25 @@
+---
+title: "README"
+author: "Maria Cuellar"
+date: "2026-02-17"
+format: 
+  gfm:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Testing
+
+```{r load-data, echo=FALSE, include=FALSE}
+
+library(tidyr)
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(usmap)
+library(readxl)
+
+```
