@@ -15,10 +15,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load-data, echo=FALSE, include=FALSE}
 
-library(tidyr)
-library(readr)
-library(dplyr)
 library(tidyverse)
+library(readr)
 library(usmap)
 library(readxl)
 
@@ -46,7 +44,6 @@ Message from Chris about the data:
 
 ```{r}
 # load data
-library(readxl)
 dat_control <- read_excel("Data/Data.xlsx", sheet = 2)
 dat_treatment <- read_excel("Data/Data.xlsx", sheet = 3)
 ```
@@ -54,6 +51,13 @@ dat_treatment <- read_excel("Data/Data.xlsx", sheet = 3)
 ```{r}
 names(dat_control)
 names(dat_treatment)
+
+
+dat_control %>%
+  select(contains("isolated"))
+
+
+
 ```
 
 
