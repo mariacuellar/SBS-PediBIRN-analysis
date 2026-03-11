@@ -1,0 +1,491 @@
+---
+title: "Clustering Analysis of PediBIRN Cases"
+author:
+  - name: "Maria Cuellar"
+  - name: "Christopher Bryan Brook"
+date: today
+bibliography: references.bib
+format:
+  pdf:
+    documentclass: article
+    classoption:
+      - 11pt
+      - oneside
+    toc: false
+    number-sections: true
+  docx: default
+header-includes:
+  - \usepackage{authblk}
+  - \usepackage{geometry}
+  - \geometry{letterpaper}
+  - \usepackage{graphicx}
+  - \usepackage{amssymb}
+  - \usepackage{amsmath}
+  - \usepackage{url}
+  - \usepackage{comment}
+  - \usepackage{booktabs}
+  - \usepackage{setspace}
+  - \usepackage{lineno}
+  - \PassOptionsToPackage{hyphens}{url}
+  - \usepackage{hyperref}
+  - \floatingpenalty=20000
+  - \widowpenalty=150
+  - \usepackage{xcolor}
+  - \newcommand\red[1]{\textcolor{red}{#1}}
+  - \usepackage[normalem]{ulem}
+  - \makeatletter
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(cluster)
+library(knitr)
+library(poLCA)
+```
+
+# Abstract
+
+Add a structured abstract here.
+
+# Introduction
+
+The diagnosis of abusive head trauma (AHT) in infants and young children remains a subject of substantial scientific and legal debate. Clinical determinations of abuse are typically based on patterns of medical findings, such as intracranial hemorrhage, retinal hemorrhage, and neurological impairment, combined with clinical history and contextual information about the child’s presentation [@Choudhary2018; @Narang2020]. Numerous studies have attempted to identify clinical features associated with abusive head trauma and to distinguish abusive from non-abusive injury in pediatric populations [@Maguire2011; @Hymel2013]. However, the evidentiary basis for these diagnostic patterns remains contested because most studies rely on physician determinations of abuse rather than independently verified ground truth [@Donohoe2003; @Maguire2009].
+
+Recently, @Boos2022 applied unsupervised clustering methods to a dataset of infants and young children with acute head injury collected through the Pediatric Brain Injury Research Network (PediBIRN). Using 32 clinical and radiologic variables, they reported that several clustering algorithms partitioned the cohort into two groups without reference to physician diagnoses. Post-hoc comparisons indicated that one cluster had a substantially higher prevalence of physician-diagnosed abuse and clinical findings commonly associated with AHT. The authors interpreted this result as evidence that abusive head trauma constitutes a distinct clinical phenotype that can be recovered directly from the data using unsupervised methods.
+
+However, unsupervised clustering algorithms can identify structure even when the resulting clusters do not correspond to meaningful etiologic categories. In biomedical datasets, clustering methods often recover gradients in disease severity or symptom burden rather than distinct causal groups [@Hastie2009; @Jain2010; @Xu2010]. When ground truth labels are uncertain, as is often the case in studies of suspected child abuse, interpreting clusters as representing diagnostic categories requires caution.
+
+In this study, we revisit the clustering analysis of @Boos2022 using 420 cases from the PediBIRN dataset. We first approximate their hierarchical clustering approach and then examine alternative cluster solutions, including latent class analysis. Our results suggest that the dominant structure in the data is more consistent with a continuum of clinical severity, particularly neurologic impairment and loss of consciousness, than with discrete categories corresponding to abusive and non-abusive injury. When the analysis is extended beyond two groups, the resulting structure aligns naturally with gradations of injury severity.
+
+These findings highlight the difficulty of inferring etiologic categories from unsupervised clustering in the absence of reliable ground truth and suggest that the apparent separation observed by @Boos2022 may reflect severity of intracranial injury rather than abuse as a distinct underlying mechanism.
+
+# Methods
+
+## Data Source
+
+The analysis used 420 cases from the Pediatric Brain Injury Research Network (PediBIRN) dataset. The workbook available for this project contained separate sheets for eligible control patients and eligible intervention patients; these were combined into a single analytic dataset because the present objective was to study patterns of patient presentation and injury findings rather than the effect of the intervention itself. The dataset includes demographic, clinical, and radiologic variables relevant to abusive head trauma and severe intracranial injury.
+
+## Variable Selection
+
+To approximate the feature set used by @Boos2022, we selected variables reflecting acute physiologic compromise, neurologic status, bruising, skull fracture pattern, intracranial hemorrhage pattern, parenchymal injury, hypoxic-ischemic swelling, and retinal hemorrhage. Most variables were recoded as binary indicators. Loss of consciousness was collapsed into an ordinal severity variable with four levels: no loss of consciousness, resolved before admission, lasting no more than 24 hours after admission, and lasting more than 24 hours after admission. We also derived composite indicators for non-isolated skull fracture and complex subdural hemorrhage distribution. Missingness across the selected clustering variables was reviewed before model fitting.
+
+## Hierarchical Clustering
+
+Hierarchical agglomerative clustering was performed using a Gower dissimilarity matrix, which is suitable for mixed binary and ordinal clinical variables. The clustering tree was fit with complete linkage. Candidate solutions from two through six clusters were compared using average silhouette width, and the two-cluster solution was carried forward because it had the highest silhouette value among the candidate models. For interpretive consistency with @Boos2022, cluster labels were reordered so that cluster 1 corresponded to the group with greater loss-of-consciousness severity.
+
+## Latent Class Analysis
+
+As an alternative unsupervised approach for categorical data, latent class analysis (LCA) was fit using the same manifest variables after recoding them as integer-valued categories for `poLCA`. Because `poLCA` requires complete data across the included manifest variables, the LCA analysis was restricted to complete cases. Models with two, three, and four classes were fit and compared using Akaike's information criterion (AIC), the Bayesian information criterion (BIC), and the likelihood-ratio statistic \(G^2\). The best-fitting LCA solution was defined as the model with the lowest BIC. Latent classes were then relabeled so that class 1 corresponded to the higher-severity loss-of-consciousness profile.
+
+```{r}
+dat_control <- read_excel("Data/Data.xlsx", sheet = "Eligible Control Patients") |>
+  mutate(data_source = "control")
+
+dat_treatment <- read_excel("Data/Data.xlsx", sheet = "Eligible Intervention Patients") |>
+  mutate(data_source = "intervention")
+
+dat_raw <- bind_rows(dat_control, dat_treatment)
+
+feature_map <- c(
+  patient_id = "Patient ID",
+  age_months = "Months",
+  respiratory_compromise = "Q4.2.1.                                    Any clinically-significant respiratory compromise at the scene of injury, during transport, in the ED, or prior to hospital admission?",
+  circulatory_compromise = "Q4.2.2.                               Any clinically-significant circulatory compromise at the scene of injury, during transport, in the ED, or prior to hospital admission?",
+  seizure = "Q4.2.3.                        Seizure(s) at the scene of injury, during transport, in the ED, or prior to hospital admission?",
+  loc_present = "Q4.2.4.                                     A clear impairment or loss of consciousness at the scene of injury, during transport, in the ED, or prior to hospital admission?",
+  loc_resolved_pre_admission = "Q4.2.5.                                      Did this child's clear impairment or loss of consciousness resolve prior to hospital admission?",
+  loc_gt_24h = "Q4.2.6.                             Did this child's clear impairment or loss of consciousness last >24 hours after admission?",
+  loc_posturing = "Q4.2.7.                          Was this child's clear impairment or loss of consciousness ever associated with flaccidity, decorticate or decerebrate posturing?",
+  torso_ear_neck_bruising = "Q4.3.2.                      Any bruising involving the child's ear(s), neck or torso?",
+  skull_fracture = "Q4.4.1.                                 Any skull fracture(s)?",
+  isolated_linear_parietal_fracture = "Q4.4.2.1.                                          What skull fracture(s) did the child manifest?                                    Only an isolated, unilateral, nondiastatic, linear, parietal skull fracture?",
+  epidural_hemorrhage = "Q4.4.3.                                        Any epidural hemorrhage(s)?",
+  subdural_hemorrhage = "Q4.4.4.                             Any subdural hemorrhage(s) or fluid collection(s)?",
+  bilateral_sdh = "Q4.4.5.2.                           Bilateral, overlying both cerebral hemispheres?",
+  interhemispheric_sdh = "Q4.4.5.3                                     Involving or extending from the interhemispheric space?",
+  subarachnoid_hemorrhage = "Q4.4.7.                         Any subarachnoid hemorrhage(s)?",
+  parenchymal_injury = "Q4.4.8.                             Any brain parenchymal contusion(s), laceration(s) or hemorrhage(s)?",
+  diffuse_axonal_injury = "Q4.4.11.                                   Are these brain parenchymal contusion(s), laceration(s) or hemorrhage(s) reasonably characterized as diffuse traumatic axonal injury?",
+  hypoxic_ischemic_swelling = "Q4.4.12.                                    Any brain hypoxia, ischemia and/or swelling?",
+  extensive_retinal_hemorrhage = "Q5.3.2.9.                       Retinal hemorrhage(s) described by an ophthalmologist as dense, extensive, covering a large surface area and/or extending to the ora serrata?"
+)
+
+to_binary_factor <- function(x) {
+  case_when(
+    is.na(x) ~ NA_character_,
+    x == 1 ~ "Yes",
+    x == 0 ~ "No",
+    TRUE ~ as.character(x)
+  ) |>
+    factor(levels = c("No", "Yes"))
+}
+
+relabel_by_loc_severity <- function(cluster, loc_severity) {
+  cluster_map <- tibble(
+    cluster = as.character(cluster),
+    loc_score = as.numeric(loc_severity)
+  ) |>
+    group_by(cluster) |>
+    summarise(mean_loc_score = mean(loc_score, na.rm = TRUE), .groups = "drop") |>
+    arrange(desc(mean_loc_score), cluster)
+
+  factor(
+    cluster,
+    levels = cluster_map$cluster,
+    labels = seq_len(nrow(cluster_map))
+  )
+}
+
+dat_analysis <- dat_raw |>
+  transmute(
+    patient_id = .data[[feature_map["patient_id"]]],
+    age_months = .data[[feature_map["age_months"]]],
+    respiratory_compromise = to_binary_factor(.data[[feature_map["respiratory_compromise"]]]),
+    circulatory_compromise = to_binary_factor(.data[[feature_map["circulatory_compromise"]]]),
+    seizure = to_binary_factor(.data[[feature_map["seizure"]]]),
+    torso_ear_neck_bruising = to_binary_factor(.data[[feature_map["torso_ear_neck_bruising"]]]),
+    skull_fracture_nonisolated = case_when(
+      .data[[feature_map["skull_fracture"]]] == 0 ~ "No",
+      .data[[feature_map["skull_fracture"]]] == 1 &
+        .data[[feature_map["isolated_linear_parietal_fracture"]]] == 1 ~ "No",
+      .data[[feature_map["skull_fracture"]]] == 1 ~ "Yes",
+      TRUE ~ NA_character_
+    ) |> factor(levels = c("No", "Yes")),
+    epidural_hemorrhage = to_binary_factor(.data[[feature_map["epidural_hemorrhage"]]]),
+    subdural_hemorrhage = to_binary_factor(.data[[feature_map["subdural_hemorrhage"]]]),
+    complex_sdh_distribution = case_when(
+      .data[[feature_map["subdural_hemorrhage"]]] == 0 ~ "No",
+      .data[[feature_map["bilateral_sdh"]]] == 1 |
+        .data[[feature_map["interhemispheric_sdh"]]] == 1 ~ "Yes",
+      .data[[feature_map["subdural_hemorrhage"]]] == 1 ~ "No",
+      TRUE ~ NA_character_
+    ) |> factor(levels = c("No", "Yes")),
+    subarachnoid_hemorrhage = to_binary_factor(.data[[feature_map["subarachnoid_hemorrhage"]]]),
+    parenchymal_injury = to_binary_factor(.data[[feature_map["parenchymal_injury"]]]),
+    diffuse_axonal_injury = to_binary_factor(.data[[feature_map["diffuse_axonal_injury"]]]),
+    hypoxic_ischemic_swelling = to_binary_factor(.data[[feature_map["hypoxic_ischemic_swelling"]]]),
+    extensive_retinal_hemorrhage = to_binary_factor(.data[[feature_map["extensive_retinal_hemorrhage"]]]),
+    loc_severity = case_when(
+      .data[[feature_map["loc_present"]]] == 0 ~ "No loss of consciousness",
+      .data[[feature_map["loc_present"]]] == 1 &
+        .data[[feature_map["loc_resolved_pre_admission"]]] == 1 ~ "Resolved before admission",
+      .data[[feature_map["loc_present"]]] == 1 &
+        .data[[feature_map["loc_gt_24h"]]] == 1 ~ ">24h after admission",
+      .data[[feature_map["loc_present"]]] == 1 &
+        .data[[feature_map["loc_posturing"]]] == 1 ~ ">24h after admission",
+      .data[[feature_map["loc_present"]]] == 1 ~ "<=24h after admission",
+      TRUE ~ NA_character_
+    ) |> ordered(levels = c(
+      "No loss of consciousness",
+      "Resolved before admission",
+      "<=24h after admission",
+      ">24h after admission"
+    ))
+  ) |>
+  mutate(
+    patient_id = coalesce(as.character(patient_id), paste0("row_", row_number()))
+  )
+
+cluster_vars <- c(
+  "respiratory_compromise",
+  "circulatory_compromise",
+  "seizure",
+  "torso_ear_neck_bruising",
+  "skull_fracture_nonisolated",
+  "epidural_hemorrhage",
+  "subdural_hemorrhage",
+  "complex_sdh_distribution",
+  "subarachnoid_hemorrhage",
+  "parenchymal_injury",
+  "diffuse_axonal_injury",
+  "hypoxic_ischemic_swelling",
+  "extensive_retinal_hemorrhage",
+  "loc_severity"
+)
+
+dat_cluster <- dat_analysis |>
+  filter(if_any(all_of(cluster_vars), ~ !is.na(.x)))
+
+cluster_input <- dat_cluster |>
+  dplyr::select(all_of(cluster_vars))
+
+gower_dist <- daisy(cluster_input, metric = "gower")
+hclust_fit <- hclust(gower_dist, method = "complete")
+
+candidate_k <- 2:6
+silhouette_tbl <- map_dfr(candidate_k, function(k) {
+  assignment <- cutree(hclust_fit, k = k)
+  sil <- silhouette(assignment, gower_dist)
+  tibble(k = k, average_silhouette_width = summary(sil)$avg.width)
+})
+
+best_k <- silhouette_tbl |>
+  slice_max(average_silhouette_width, n = 1, with_ties = FALSE) |>
+  pull(k)
+
+dat_cluster <- dat_cluster |>
+  mutate(
+    cluster_2 = relabel_by_loc_severity(cutree(hclust_fit, k = 2), loc_severity),
+    cluster_3 = relabel_by_loc_severity(cutree(hclust_fit, k = 3), loc_severity),
+    cluster_4 = relabel_by_loc_severity(cutree(hclust_fit, k = 4), loc_severity)
+  )
+
+cluster_size_tbl <- dat_cluster |>
+  count(cluster_2, name = "n") |>
+  mutate(prop = n / sum(n))
+
+driver_table_binary <- dat_cluster |>
+  mutate(across(all_of(cluster_vars[cluster_vars != "loc_severity"]), ~ .x == "Yes")) |>
+  pivot_longer(
+    cols = all_of(cluster_vars[cluster_vars != "loc_severity"]),
+    names_to = "variable",
+    values_to = "value"
+  ) |>
+  group_by(variable, cluster_2) |>
+  summarise(proportion_yes = mean(value, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = cluster_2, values_from = proportion_yes, names_prefix = "cluster_") |>
+  mutate(difference = cluster_2 - cluster_1, abs_difference = abs(difference))
+
+driver_table_loc <- dat_cluster |>
+  transmute(variable = "loc_severity_score", cluster_2, value = as.numeric(loc_severity) - 1) |>
+  group_by(variable, cluster_2) |>
+  summarise(mean_score = mean(value, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = cluster_2, values_from = mean_score, names_prefix = "cluster_") |>
+  mutate(difference = cluster_2 - cluster_1, abs_difference = abs(difference))
+
+driver_table <- bind_rows(driver_table_binary, driver_table_loc) |>
+  arrange(desc(abs_difference))
+
+table1_loc <- dat_cluster |>
+  count(cluster_2, loc_severity) |>
+  group_by(cluster_2) |>
+  mutate(prop = n / sum(n)) |>
+  ungroup()
+
+lca_vars <- cluster_vars
+lca_data <- dat_cluster |>
+  transmute(patient_id, across(all_of(lca_vars), as.integer)) |>
+  drop_na(all_of(lca_vars))
+
+lca_formula <- as.formula(paste("cbind(", paste(lca_vars, collapse = ", "), ") ~ 1"))
+set.seed(123)
+lca_fits <- map(
+  2:4,
+  ~ {
+    fit <- NULL
+    capture.output(
+      fit <- poLCA(
+        lca_formula,
+        data = lca_data,
+        nclass = .x,
+        nrep = 5,
+        maxiter = 3000,
+        verbose = FALSE,
+        calc.se = FALSE
+      )
+    )
+    fit
+  }
+)
+
+lca_fit_tbl <- map2_dfr(
+  lca_fits,
+  2:4,
+  ~ tibble(nclass = .y, aic = .x$aic, bic = .x$bic, g_squared = .x$Gsq)
+)
+
+best_lca_k <- lca_fit_tbl |>
+  slice_min(bic, n = 1, with_ties = FALSE) |>
+  pull(nclass)
+
+best_lca <- lca_fits[[best_lca_k - 1]]
+lca_results <- lca_data |>
+  mutate(lca_class_raw = factor(best_lca$predclass))
+
+lca_class_map <- lca_results |>
+  group_by(lca_class_raw) |>
+  summarise(mean_loc_score = mean(loc_severity, na.rm = TRUE), .groups = "drop") |>
+  arrange(desc(mean_loc_score), lca_class_raw)
+
+lca_results <- lca_results |>
+  mutate(
+    lca_class = factor(lca_class_raw, levels = lca_class_map$lca_class_raw, labels = seq_len(nrow(lca_class_map)))
+  )
+
+lca_item_prob_tbl <- imap_dfr(
+  best_lca$probs,
+  ~ {
+    prob_mat <- as.data.frame(.x)
+    prob_mat$class_raw <- rownames(prob_mat)
+    prob_mat |>
+      pivot_longer(cols = starts_with("Pr("), names_to = "response", values_to = "probability") |>
+      mutate(variable = .y)
+  }
+) |>
+  mutate(class_raw = factor(class_raw, levels = rownames(best_lca$probs[[1]])))
+
+lca_plot_class_map <- tibble(
+  class_raw = factor(paste0("class ", as.character(lca_class_map$lca_class_raw), ": "), levels = levels(lca_item_prob_tbl$class_raw)),
+  class = factor(seq_len(nrow(lca_class_map)))
+)
+
+lca_binary_prob_tbl <- lca_item_prob_tbl |>
+  filter((variable != "loc_severity" & response == "Pr(2)") | (variable == "loc_severity" & response != "Pr(1)")) |>
+  mutate(variable = if_else(variable == "loc_severity", "any_loss_of_consciousness", variable)) |>
+  left_join(lca_plot_class_map, by = "class_raw") |>
+  group_by(class, variable) |>
+  summarise(probability = sum(probability), .groups = "drop") |>
+  group_by(variable) |>
+  mutate(class1_probability = probability[class == "1"][1]) |>
+  ungroup()
+
+lca_variable_order <- lca_binary_prob_tbl |>
+  distinct(variable, class1_probability) |>
+  arrange(desc(class1_probability)) |>
+  pull(variable)
+
+lca_binary_prob_tbl <- lca_binary_prob_tbl |>
+  mutate(variable = factor(variable, levels = lca_variable_order))
+```
+
+# Results
+
+## Cohort Description
+
+The combined analytic dataset contained `r nrow(dat_raw)` eligible PediBIRN cases. For the hierarchical clustering analysis, cases were retained if at least one of the selected clustering variables was non-missing, yielding `r nrow(dat_cluster)` cases. Missingness across the clustering variables was limited enough to allow a full-sample hierarchical clustering analysis, although the latent class analysis required restriction to complete cases and therefore used a smaller subset of `r nrow(lca_data)` patients.
+
+## Hierarchical Clustering Results
+
+Among candidate hierarchical clustering solutions from two through six clusters, the two-cluster solution had the highest average silhouette width (`r round(silhouette_tbl$average_silhouette_width[silhouette_tbl$k == 2], 3)`), although the magnitude of that value still suggested only modest separation. The resulting two-cluster solution was imbalanced in size and, after relabeling for interpretive consistency, cluster 1 corresponded to the higher-severity profile.
+
+```{r}
+ggplot(cluster_size_tbl, aes(x = cluster_2, y = n, fill = cluster_2)) +
+  geom_col(show.legend = FALSE) +
+  labs(
+    title = "Cluster sizes for the two-cluster solution",
+    x = "Cluster",
+    y = "Number of cases"
+  ) +
+  theme_minimal()
+```
+
+To understand what distinguished the two clusters, variables were ranked by their absolute between-cluster difference. The largest differences were observed for loss-of-consciousness severity, hypoxic-ischemic swelling, and circulatory compromise, indicating that the main separation was strongly linked to neurologic severity rather than to a narrowly trauma-specific pattern alone.
+
+```{r}
+driver_plot_tbl <- driver_table |>
+  mutate(variable = fct_reorder(variable, abs_difference))
+
+ggplot(driver_plot_tbl, aes(x = abs_difference, y = variable, fill = difference > 0)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c("#3C6E71", "#D1495B"),
+    labels = c("Higher in cluster 1", "Higher in cluster 2"),
+    name = NULL
+  ) +
+  labs(
+    title = "Variables most strongly separating the two clusters",
+    x = "Absolute difference between clusters",
+    y = NULL
+  ) +
+  theme_minimal()
+```
+
+Loss-of-consciousness severity showed especially strong separation across the two-cluster solution. Cluster 1 was dominated by the most severe category, whereas cluster 2 was dominated by the absence of loss of consciousness.
+
+```{r}
+ggplot(table1_loc, aes(x = cluster_2, y = prop, fill = loc_severity)) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    title = "Loss-of-consciousness severity by cluster",
+    x = "Cluster",
+    y = "Proportion within cluster",
+    fill = "LOC severity"
+  ) +
+  theme_minimal()
+```
+
+## Latent Class Analysis Results
+
+The LCA was fit on complete cases only. Comparing two-, three-, and four-class solutions by information criteria indicated that the two-class model had the lowest BIC and therefore the best fit among the candidate models considered here.
+
+```{r}
+ggplot(lca_fit_tbl, aes(x = nclass, y = bic)) +
+  geom_line() +
+  geom_point(size = 2) +
+  scale_x_continuous(breaks = lca_fit_tbl$nclass) +
+  labs(
+    title = "LCA model fit by number of classes",
+    x = "Number of latent classes",
+    y = "BIC"
+  ) +
+  theme_minimal()
+```
+
+The best-fitting two-class LCA solution reproduced the same general pattern seen in the hierarchical clustering. To simplify comparison with the binary clinical features, loss of consciousness was collapsed into an indicator of any loss of consciousness versus none. Under that simplification, the highest-probability features in class 1 again reflected greater neurologic severity.
+
+```{r}
+ggplot(lca_binary_prob_tbl, aes(x = probability, y = fct_rev(variable), color = class)) +
+  geom_point(size = 2.5, alpha = 0.9) +
+  scale_color_manual(values = c("1" = "#1f78b4", "2" = "#e31a1c")) +
+  labs(
+    title = "Probability of each binary feature by latent class",
+    x = "Estimated probability that the feature is present",
+    y = NULL,
+    color = "Latent class"
+  ) +
+  theme_minimal()
+```
+
+## Sensitivity Analyses
+
+When the hierarchical clustering was extended to three and four clusters, the additional groups still appeared to be organized primarily by differing levels of loss-of-consciousness severity rather than by a clean separation into abuse-specific and non-abuse-specific phenotypes. In the three-cluster solution, one cluster remained dominated by prolonged loss of consciousness while the remaining clusters included progressively less severe neurologic profiles. The four-cluster solution preserved the same basic pattern. Together, these sensitivity analyses support the interpretation that the dominant signal in the data reflects a severity gradient.
+
+# Discussion
+
+Across the hierarchical clustering and latent class analyses, the same basic pattern appeared repeatedly: the dominant separation in the data was strongly related to neurologic severity, especially loss of consciousness, and was also associated with hypoxic-ischemic swelling and other markers of severe intracranial injury. This weakens a simple interpretation of one cluster or class as representing an abuse-specific phenotype. Instead, the present results are more consistent with the possibility that the strongest unsupervised signal in these data reflects severity of intracranial pathology, with findings commonly associated with abusive head trauma co-occurring within that broader severity pattern.
+
+This does not imply that abuse-related injuries are irrelevant to the observed clustering structure. Rather, it suggests that the unsupervised methods used here do not distinguish cleanly between a pattern driven by abuse specifically and a pattern driven by downstream manifestations of severe brain injury. In that sense, the present reanalysis supports a more cautious reading of @Boos2022. The groups identified by clustering may be statistically real, but their clinical interpretation remains uncertain unless supported by external evidence that separates etiologic mechanism from severity of injury.
+
+The consistency of the findings across methods is important. The hierarchical clustering, the three- and four-cluster sensitivity checks, and the best-fitting two-class latent class analysis all pointed toward the same organizing feature: increasing neurologic compromise, particularly loss of consciousness. This convergence argues against the result being an artifact of a single algorithm. At the same time, it does not establish that the resulting groups correspond to distinct causal categories. Instead, it suggests that multiple unsupervised methods are detecting the same severity gradient in the data.
+
+## Causal Interpretation
+
+One way to frame these results causally is to distinguish between an unobserved exposure, an underlying severity process, and the observed clinical features used in clustering. Let $A$ denote abuse status or an abuse-related injury mechanism, let $S$ denote severity of intracranial or neurologic injury, let $X = (X_1, \ldots, X_p)$ denote the observed clinical and radiologic variables used in clustering, and let $C$ denote the resulting cluster assignment.
+
+Under this setup, a plausible causal structure is
+
+$$
+\begin{aligned}
+A &\to S, \\
+A &\to X_j, \\
+S &\to X_j, \qquad j = 1, \ldots, p.
+\end{aligned}
+$$
+
+The clustering itself is then a deterministic function of the observed variables:
+
+$$
+C = g(X_1, \ldots, X_p).
+$$
+
+Equivalently, each observed feature can be written as
+
+$$
+X_j = f_j(A, S, U_j), \qquad j = 1, \ldots, p,
+$$
+
+where $U_j$ represents other unmeasured causes of feature $X_j$. Under this framework, cluster or class assignment is not itself a causal variable and should not be interpreted as a direct measure of abuse. Rather, it is a constructed summary of the observed feature vector. If variables such as loss of consciousness, hypoxic-ischemic injury, retinal hemorrhage, and subdural hemorrhage are strongly influenced by severity of intracranial pathology, then the clustering may primarily reflect $S$ rather than $A$. For that reason, even if cluster membership is associated with abuse-related findings, the cluster solution remains descriptive and does not by itself identify an abuse mechanism.
+
+# Limitations
+
+This analysis has several limitations. First, the feature set used here is an approximation of the variables used by @Boos2022 rather than a fully confirmed reproduction of their exact clustering specification. Second, the latent class analysis was restricted to complete cases, reducing the analytic sample and potentially altering the class structure relative to the full cohort. Third, the available dataset does not provide an independently verified ground-truth indicator of abuse, which limits the ability to determine whether any cluster corresponds to a true etiologic category. Fourth, because the clustering variables themselves include findings that may be downstream consequences of severe brain injury, the methods are inherently vulnerable to identifying severity patterns rather than causal injury mechanisms.
+
+# Conclusion
+
+In this reanalysis of PediBIRN cases, the clustering structure was most consistent with differences in neurologic severity, particularly severity of loss of consciousness. That pattern may help explain why other signs and symptoms, such as hypoxic-ischemic injury and related radiologic findings, cluster together in the same group. However, this does not imply that one cluster represents abuse and the other does not. Rather, the findings suggest that the dominant unsupervised signal in these data may reflect severity of intracranial injury rather than a distinct abuse-specific phenotype.

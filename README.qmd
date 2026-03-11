@@ -671,7 +671,5 @@ Points to verify against the paper:
 - Whether the paper treated loss of consciousness as a single ordinal severity variable or as separate binary indicators.
 - Whether Table 1 in the paper reports all patients, only complete cases, or a subset after additional exclusions.
 
-# Questions for Chris
-
 - What exactly was the intervention being tested in the PediBIRN intervention sites?
 - For the clustering analysis, is it appropriate to combine the intervention and control patients into a single analysis dataset, given that the goal is to study the underlying patient injury patterns rather than the intervention itself?
