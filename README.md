@@ -52,7 +52,6 @@ Message from Chris about the data:
 
 ``` r
 # load data
-library(readxl)
 dat_control <- read_excel("Data/Data.xlsx", sheet = 2)
 ```
 
@@ -473,3 +472,34 @@ names(dat_treatment)
     [257] "Subgroup 16"                                                                                                                                                                                                                                                                                          
     [258] "SUBGROUP"                                                                                                                                                                                                                                                                                             
     [259] "Patient-specific, Evidence-based, Estimate of Abuse Probability (From Derivation + Validation Studies)"                                                                                                                                                                                               
+
+``` r
+dat_control %>%
+  select(contains("isolated"))
+```
+
+    # A tibble: 243 × 2
+       Q4.4.2.1.                                          W…¹ Any skull fracture(s…²
+                                                        <dbl> <lgl>                 
+     1                                                      1 FALSE                 
+     2                                                      0 FALSE                 
+     3                                                      0 FALSE                 
+     4                                                      0 FALSE                 
+     5                                                      0 FALSE                 
+     6                                                      0 FALSE                 
+     7                                                      1 FALSE                 
+     8                                                      0 TRUE                  
+     9                                                      0 FALSE                 
+    10                                                      0 TRUE                  
+    # ℹ 233 more rows
+    # ℹ abbreviated names:
+    #   ¹​`Q4.4.2.1.                                          What skull fracture(s) did the child manifest?                                    Only an isolated, unilateral, nondiastatic, linear, parietal skull fracture?`,
+    #   ²​`Any skull fracture(s) other than an isolated, unilateral, nondiastatic, linear, parietal skull fracture?`
+
+``` r
+isolated_inertial_injury <- dat_control %>%
+  select(contains("Q4.4.2.1."))
+
+diffuse_hie <- dat_control %>%
+  select(contains("diffuse"))
+```

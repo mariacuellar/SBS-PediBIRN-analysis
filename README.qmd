@@ -56,7 +56,12 @@ names(dat_treatment)
 dat_control %>%
   select(contains("isolated"))
 
+isolated_inertial_injury <- dat_control %>%
+  select(contains("Q4.4.2.1."))
 
+diffuse_hie <- dat_control %>%
+  select(contains("diffuse"))
+ 
 
 ```
 
