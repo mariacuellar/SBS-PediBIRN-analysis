@@ -83,10 +83,10 @@ Hierarchical agglomerative clustering was performed using a Gower dissimilarity 
 As an alternative unsupervised approach for categorical data, latent class analysis (LCA) was fit using the same manifest variables after recoding them as integer-valued categories for `poLCA`. Because `poLCA` requires complete data across the included manifest variables, the LCA analysis was restricted to complete cases. Models with two, three, and four classes were fit and compared using Akaike's information criterion (AIC), the Bayesian information criterion (BIC), and the likelihood-ratio statistic \(G^2\). The best-fitting LCA solution was defined as the model with the lowest BIC. Latent classes were then relabeled so that class 1 corresponded to the higher-severity loss-of-consciousness profile.
 
 ```{r}
-dat_control <- read_excel("Data/Data.xlsx", sheet = "Eligible Control Patients") |>
+dat_control <- read_excel("../Data/Data.xlsx", sheet = "Eligible Control Patients") |>
   mutate(data_source = "control")
 
-dat_treatment <- read_excel("Data/Data.xlsx", sheet = "Eligible Intervention Patients") |>
+dat_treatment <- read_excel("../Data/Data.xlsx", sheet = "Eligible Intervention Patients") |>
   mutate(data_source = "intervention")
 
 dat_raw <- bind_rows(dat_control, dat_treatment)

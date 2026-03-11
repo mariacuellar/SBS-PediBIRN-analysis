@@ -22,7 +22,7 @@ library(poLCA)
 
 # Overview
 
-This document replicates the Boos clustering analysis as closely as possible with the variables available in `Data/Data.xlsx`.
+This document replicates the Boos clustering analysis as closely as possible with the variables available in `../Data/Data.xlsx`.
 
 Because the exact feature list and clustering settings from the paper have not yet been fully extracted from the PDF, this file uses an explicit Boos-style approximation:
 
@@ -39,10 +39,10 @@ The key design choice is that every clustering variable is defined in one place 
 Chris described this dataset as a set of 420 PediBIRN cases used in the Hymel et al. and Boos et al. papers. His main interest was the Boos 2022 clustering analysis, which used a Gower matrix and produced a two-cluster solution that Boos interpreted as including an abuse-associated cluster. Chris noted, however, that the cluster profiles can also be read differently, because the group Boos interpreted as abuse-associated appears to be heavily characterized by severity of intracranial pathology, including prolonged loss of consciousness and hypoxia. He also noted concerns about the later Boos 2025 mediation analysis, particularly the treatment of outcomes such as loss of consciousness and subdural hemorrhage as if they were exposure proxies. In his own exploratory work, Chris found that a two-class latent class analysis broadly reproduced the Boos clustering pattern, and that a three-class solution appeared to separate cases mainly by increasing levels of loss of consciousness severity, with retinal hemorrhage and subdural hemorrhage increasing across classes. This analysis is therefore motivated both by replication of the Boos clustering results and by the question of whether the main clustering signal reflects abuse specifically or rather the severity of intracranial injury.
 
 ```{r}
-dat_control <- read_excel("Data/Data.xlsx", sheet = "Eligible Control Patients") |>
+dat_control <- read_excel("../Data/Data.xlsx", sheet = "Eligible Control Patients") |>
   mutate(data_source = "control")
 
-dat_treatment <- read_excel("Data/Data.xlsx", sheet = "Eligible Intervention Patients") |>
+dat_treatment <- read_excel("../Data/Data.xlsx", sheet = "Eligible Intervention Patients") |>
   mutate(data_source = "intervention")
 
 dat_raw <- bind_rows(dat_control, dat_treatment)
