@@ -1032,8 +1032,6 @@ does not by itself identify an abuse mechanism.
 
 # Next Steps
 
-Use this section to compare the cluster profiles against Boos et al.
-
 Points to verify against the paper:
 
 - Whether `complete` linkage should be replaced with another
@@ -1044,9 +1042,6 @@ Points to verify against the paper:
   severity variable or as separate binary indicators.
 - Whether Table 1 in the paper reports all patients, only complete
   cases, or a subset after additional exclusions.
-
-If you want a stricter replication, the next step is to confirm the
-exact Boos variable list and then lock this file to that specification.
 
 # Questions for Chris
 
