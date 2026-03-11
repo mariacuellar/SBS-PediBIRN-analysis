@@ -1,53 +1,3 @@
----
-title: "Clustering Analysis"
-author: "Maria Cuellar"
-date: today
-format:
-  html:
-    toc: true
-    number-sections: true
-execute:
-  echo: true
-  warning: false
-  message: false
----
-
-
-``` r
-library(tidyverse)
-```
-
-```
-## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   4.0.0     ✔ tibble    3.2.1
-## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-```
-
-``` r
-library(readxl)
-library(cluster)
-library(knitr)
-library(poLCA)
-```
-
-```
-## Loading required package: scatterplot3d
-## Loading required package: MASS
-## 
-## Attaching package: 'MASS'
-## 
-## The following object is masked from 'package:dplyr':
-## 
-##     select
-```
-
 # Overview
 
 This document replicates the Boos clustering analysis as closely as possible with the variables available in `../Data/Data.xlsx`.
@@ -337,7 +287,7 @@ par(lwd = 3)
 rect.hclust(hclust_fit, k = 2, border = 2:3)
 ```
 
-![plot of chunk unnamed-chunk-6](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-6-1.png)
+![plot of chunk unnamed-chunk-6](clustering-analysis_files/figure-html/unnamed-chunk-6-1.png)
 
 ``` r
 par(lwd = 1)
@@ -375,7 +325,7 @@ ggplot(cluster_size_tbl, aes(x = cluster_2, y = n, fill = cluster_2)) +
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-8](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-8-1.png)
+![plot of chunk unnamed-chunk-8](clustering-analysis_files/figure-html/unnamed-chunk-8-1.png)
 
 This plot shows the size of each cluster in the two-cluster solution. It makes the imbalance between the two groups easier to see than the table alone.
 
@@ -461,7 +411,7 @@ ggplot(driver_plot_tbl, aes(x = abs_difference, y = variable, fill = difference 
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-10](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-10-1.png)
+![plot of chunk unnamed-chunk-10](clustering-analysis_files/figure-html/unnamed-chunk-10-1.png)
 
 This plot visualizes the variables that most strongly distinguish the two clusters. Longer bars indicate larger differences between cluster 1 and cluster 2, making it easier to see whether the separation is being driven primarily by neurologic severity variables, abuse-correlated findings, or a mixture of both.
 
@@ -506,7 +456,7 @@ ggplot(table1_loc, aes(x = cluster_2, y = prop, fill = loc_severity)) +
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-12](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-12](clustering-analysis_files/figure-html/unnamed-chunk-12-1.png)
 
 This stacked bar chart makes the loss-of-consciousness severity profile of each cluster easier to compare visually. It shows how much each severity category contributes to the composition of each cluster.
 
@@ -709,7 +659,7 @@ ggplot(lca_fit_tbl, aes(x = nclass, y = bic)) +
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-17](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-17-1.png)
+![plot of chunk unnamed-chunk-17](clustering-analysis_files/figure-html/unnamed-chunk-17-1.png)
 
 This plot shows how the LCA model-fit criterion changes as the number of latent classes increases. Lower values indicate a better tradeoff between fit and complexity, so the lowest point marks the preferred solution by BIC.
 
@@ -830,7 +780,7 @@ ggplot(lca_binary_prob_tbl, aes(x = probability, y = fct_rev(variable), color = 
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-19](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-19](clustering-analysis_files/figure-html/unnamed-chunk-19-1.png)
 
 For this plot, `loc_severity` was simplified into a binary indicator of `any_loss_of_consciousness`, where `No loss of consciousness` was treated as `No` and all other categories were grouped as `Yes`. Under that simplification, the plot shows that loss of consciousness remains one of the features that most clearly separates the latent classes. Together with the class-specific `loc_severity` table above, this suggests that the same basic pattern seen in the hierarchical clustering also appears in the LCA: neurologic severity, and especially loss of consciousness, is a major organizing feature of the latent classes.
 
@@ -883,7 +833,7 @@ ggplot(age_summary, aes(x = age_months, y = prop, fill = cluster_2)) +
   theme_minimal()
 ```
 
-![plot of chunk unnamed-chunk-21](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-21-1.png)
+![plot of chunk unnamed-chunk-21](clustering-analysis_files/figure-html/unnamed-chunk-21-1.png)
 
 This plot visualizes the age-category distribution within each cluster. The similar bar heights across the two groups reinforce the conclusion that age does not appear to meaningfully separate the clusters in the current analysis.
 
