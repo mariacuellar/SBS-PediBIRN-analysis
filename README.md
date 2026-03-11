@@ -950,37 +950,43 @@ from injury severity.
 
 One way to frame these results causally is to distinguish between an
 unobserved exposure, an underlying severity process, and the observed
-clinical features used in clustering. Let (A) denote abuse status or an
-abuse-related injury mechanism, let (S) denote severity of intracranial
-or neurologic injury, let (X = (X_1, , X_p)) denote the observed
-clinical and radiologic variables used in clustering, and let (C) denote
+clinical features used in clustering. Let $A$ denote abuse status or an
+abuse-related injury mechanism, let $S$ denote severity of intracranial
+or neurologic injury, let $X = (X_1, \ldots, X_p)$ denote the observed
+clinical and radiologic variables used in clustering, and let $C$ denote
 the resulting cluster assignment.
 
 Under this setup, a plausible causal structure is:
 
-\[ A S \]
-
-\[ A X_j \]
-
-\[ S X_j, j = 1, , p \]
+$$
+\begin{aligned}
+A &\to S, \\
+A &\to X_j, \\
+S &\to X_j, \qquad j = 1, \ldots, p.
+\end{aligned}
+$$
 
 and the clustering itself is a deterministic function of the observed
 variables:
 
-\[ C = g(X_1, , X_p) \]
+$$
+C = g(X_1, \ldots, X_p).
+$$
 
 Equivalently, each observed feature can be written as:
 
-\[ X_j = f_j(A, S, U_j), j = 1, , p \]
+$$
+X_j = f_j(A, S, U_j), \qquad j = 1, \ldots, p,
+$$
 
-where (U_j) represents other unmeasured causes of feature (X_j). Under
-this framework, the cluster assignment (C) is not itself a causal
+where $U_j$ represents other unmeasured causes of feature $X_j$. Under
+this framework, the cluster assignment $C$ is not itself a causal
 variable and should not be interpreted as a direct measure of abuse.
 Instead, it is a constructed summary of the observed feature vector. If
 variables such as loss of consciousness, hypoxic-ischemic injury, or
 retinal hemorrhage are strongly influenced by severity of intracranial
-pathology, then the clustering may primarily reflect (S) rather than
-(A). For that reason, even if cluster membership is associated with
+pathology, then the clustering may primarily reflect $S$ rather than
+$A$. For that reason, even if cluster membership is associated with
 abuse-related findings, the cluster solution remains descriptive and
 does not by itself identify an abuse mechanism.
 
