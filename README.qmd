@@ -50,7 +50,7 @@ dat_raw <- bind_rows(dat_control, dat_treatment)
 nrow(dat_raw)
 ```
 
-# Data Preparation
+## Data Preparation
 
 ```{r}
 feature_map <- c(
@@ -190,7 +190,7 @@ In the data-preparation step, the eligible control and intervention sheets were 
 
 The table below lists the variables included in the clustering analysis and shows the proportion of missing values for each one. This provides a quick check of the feature set used to construct the Gower distance matrix and highlights where incomplete data may affect the clustering results.
 
-# Clustering Analysis
+# Hierarchical Clustering
 
 ```{r}
 cluster_input <- dat_cluster |>
@@ -231,7 +231,7 @@ dat_cluster <- dat_cluster |>
   )
 ```
 
-# Results
+## Two-Cluster Solution
 
 ```{r}
 plot(hclust_fit, labels = FALSE, main = "Hierarchical clustering on Gower distance")
@@ -351,7 +351,7 @@ This stacked bar chart makes the loss-of-consciousness severity profile of each 
 
 This table shows the distribution of loss-of-consciousness severity across the two clusters. In the current results, `loc_severity` appears to be strongly associated with cluster membership: cluster 1 is dominated by patients with loss of consciousness lasting more than 24 hours after admission, whereas cluster 2 is dominated by patients with no loss of consciousness. This suggests that level of neurologic compromise is an important contributor to the observed separation between clusters.
 
-## Three-Cluster and Four-Cluster Checks
+## Three- and Four-Cluster Checks
 
 ```{r}
 table_loc_3 <- dat_cluster |>
@@ -377,7 +377,7 @@ kable(table_loc_4, digits = 3, caption = "Table 8. Loss-of-consciousness severit
 
 This table shows the distribution of loss-of-consciousness severity across the four-cluster solution. In the current results, the four-cluster analysis still retains a cluster dominated by prolonged loss of consciousness, while the other clusters are more concentrated in the lower-severity categories, especially no loss of consciousness. Taken together, the three-cluster and four-cluster solutions suggest that loss of consciousness remains an important organizing feature of the clustering structure rather than being an artifact of forcing only two clusters.
 
-## Latent Class Analysis
+# Latent Class Analysis
 
 ```{r}
 lca_vars <- c(
@@ -576,7 +576,7 @@ ggplot(lca_binary_prob_tbl, aes(x = probability, y = fct_rev(variable), color = 
 
 For this plot, `loc_severity` was simplified into a binary indicator of `any_loss_of_consciousness`, where `No loss of consciousness` was treated as `No` and all other categories were grouped as `Yes`. Under that simplification, the plot shows that loss of consciousness remains one of the features that most clearly separates the latent classes. Together with the class-specific `loc_severity` table above, this suggests that the same basic pattern seen in the hierarchical clustering also appears in the LCA: neurologic severity, and especially loss of consciousness, is a major organizing feature of the latent classes.
 
-## Age Distribution by Cluster
+# Age Comparison
 
 ```{r}
 age_levels <- c("1 thru 6", "7 thru 12", "13 thru 18", "19 thru 24", "25 thru 32")

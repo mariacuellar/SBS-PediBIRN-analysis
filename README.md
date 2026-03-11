@@ -4,17 +4,18 @@ Maria Cuellar
 
 - [<span class="toc-section-number">1</span> Overview](#overview)
 - [<span class="toc-section-number">2</span> Data](#data)
-- [<span class="toc-section-number">3</span> Data
-  Preparation](#data-preparation)
-- [<span class="toc-section-number">4</span> Clustering
-  Analysis](#clustering-analysis)
-- [<span class="toc-section-number">5</span> Results](#results)
-  - [<span class="toc-section-number">5.1</span> Three-Cluster and
-    Four-Cluster Checks](#three-cluster-and-four-cluster-checks)
-  - [<span class="toc-section-number">5.2</span> Latent Class
-    Analysis](#latent-class-analysis)
-  - [<span class="toc-section-number">5.3</span> Age Distribution by
-    Cluster](#age-distribution-by-cluster)
+  - [<span class="toc-section-number">2.1</span> Data
+    Preparation](#data-preparation)
+- [<span class="toc-section-number">3</span> Hierarchical
+  Clustering](#hierarchical-clustering)
+  - [<span class="toc-section-number">3.1</span> Two-Cluster
+    Solution](#two-cluster-solution)
+  - [<span class="toc-section-number">3.2</span> Three- and Four-Cluster
+    Checks](#three--and-four-cluster-checks)
+- [<span class="toc-section-number">4</span> Latent Class
+  Analysis](#latent-class-analysis)
+- [<span class="toc-section-number">5</span> Age
+  Comparison](#age-comparison)
 - [<span class="toc-section-number">6</span> Discussion](#discussion)
   - [<span class="toc-section-number">6.1</span> Causal
     Interpretation](#causal-interpretation)
@@ -78,7 +79,7 @@ nrow(dat_raw)
 
     [1] 432
 
-# Data Preparation
+## Data Preparation
 
 ``` r
 feature_map <- c(
@@ -258,7 +259,7 @@ quick check of the feature set used to construct the Gower distance
 matrix and highlights where incomplete data may affect the clustering
 results.
 
-# Clustering Analysis
+# Hierarchical Clustering
 
 ``` r
 cluster_input <- dat_cluster |>
@@ -322,7 +323,7 @@ dat_cluster <- dat_cluster |>
   )
 ```
 
-# Results
+## Two-Cluster Solution
 
 ``` r
 plot(hclust_fit, labels = FALSE, main = "Hierarchical clustering on Gower distance")
@@ -521,7 +522,7 @@ no loss of consciousness. This suggests that level of neurologic
 compromise is an important contributor to the observed separation
 between clusters.
 
-## Three-Cluster and Four-Cluster Checks
+## Three- and Four-Cluster Checks
 
 ``` r
 table_loc_3 <- dat_cluster |>
@@ -600,7 +601,7 @@ that loss of consciousness remains an important organizing feature of
 the clustering structure rather than being an artifact of forcing only
 two clusters.
 
-## Latent Class Analysis
+# Latent Class Analysis
 
 ``` r
 lca_vars <- c(
@@ -864,7 +865,7 @@ suggests that the same basic pattern seen in the hierarchical clustering
 also appears in the LCA: neurologic severity, and especially loss of
 consciousness, is a major organizing feature of the latent classes.
 
-## Age Distribution by Cluster
+# Age Comparison
 
 ``` r
 age_levels <- c("1 thru 6", "7 thru 12", "13 thru 18", "19 thru 24", "25 thru 32")
