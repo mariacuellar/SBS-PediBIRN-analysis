@@ -658,3 +658,8 @@ Points to verify against the paper:
 - Whether Table 1 in the paper reports all patients, only complete cases, or a subset after additional exclusions.
 
 If you want a stricter replication, the next step is to confirm the exact Boos variable list and then lock this file to that specification.
+
+# Questions for Chris
+
+- What exactly was the intervention being tested in the PediBIRN intervention sites?
+- For the clustering analysis, is it appropriate to combine the intervention and control patients into a single analysis dataset, given that the goal is to study the underlying patient injury patterns rather than the intervention itself?
