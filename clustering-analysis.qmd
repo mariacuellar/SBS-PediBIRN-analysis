@@ -36,6 +36,8 @@ The key design choice is that every clustering variable is defined in one place 
 
 # Data
 
+Chris described this dataset as a set of 420 PediBIRN cases used in the Hymel et al. and Boos et al. papers. His main interest was the Boos 2022 clustering analysis, which used a Gower matrix and produced a two-cluster solution that Boos interpreted as including an abuse-associated cluster. Chris noted, however, that the cluster profiles can also be read differently, because the group Boos interpreted as abuse-associated appears to be heavily characterized by severity of intracranial pathology, including prolonged loss of consciousness and hypoxia. He also noted concerns about the later Boos 2025 mediation analysis, particularly the treatment of outcomes such as loss of consciousness and subdural hemorrhage as if they were exposure proxies. In his own exploratory work, Chris found that a two-class latent class analysis broadly reproduced the Boos clustering pattern, and that a three-class solution appeared to separate cases mainly by increasing levels of loss of consciousness severity, with retinal hemorrhage and subdural hemorrhage increasing across classes. This analysis is therefore motivated both by replication of the Boos clustering results and by the question of whether the main clustering signal reflects abuse specifically or rather the severity of intracranial injury.
+
 ```{r}
 dat_control <- read_excel("Data/Data.xlsx", sheet = "Eligible Control Patients") |>
   mutate(data_source = "control")
@@ -608,7 +610,13 @@ This plot visualizes the age-category distribution within each cluster. The simi
 
 # Discussion
 
-One way to frame the clustering results causally is to distinguish between an unobserved exposure, an underlying severity process, and the observed clinical features used in clustering. Let \(A\) denote abuse status or an abuse-related injury mechanism, let \(S\) denote severity of intracranial or neurologic injury, let \(X = (X_1, \dots, X_p)\) denote the observed clinical and radiologic variables used in clustering, and let \(C\) denote the resulting cluster assignment.
+Across the hierarchical clustering and latent class analyses, the same basic pattern appears repeatedly: the main separation between groups is strongly related to neurologic severity, especially loss of consciousness, and is also associated with hypoxic-ischemic swelling and other markers of severe intracranial injury. This makes it difficult to interpret one cluster or class as representing abuse in any simple or direct way. Instead, the results are more consistent with the possibility that the dominant clustering signal reflects severity of intracranial pathology, with abuse-correlated findings co-occurring within that broader severity pattern.
+
+This does not mean that abuse-related injuries are irrelevant to the clustering structure. Rather, it means that the unsupervised methods used here do not distinguish between a pattern driven by abuse specifically and a pattern driven by downstream manifestations of severe brain injury. In that sense, the present results support a more cautious reading of the Boos analysis: the observed groups may be real statistical groupings, but their interpretation remains uncertain unless supported by external evidence that clearly separates abuse mechanism from injury severity.
+
+## Causal Interpretation
+
+One way to frame these results causally is to distinguish between an unobserved exposure, an underlying severity process, and the observed clinical features used in clustering. Let \(A\) denote abuse status or an abuse-related injury mechanism, let \(S\) denote severity of intracranial or neurologic injury, let \(X = (X_1, \dots, X_p)\) denote the observed clinical and radiologic variables used in clustering, and let \(C\) denote the resulting cluster assignment.
 
 Under this setup, a plausible causal structure is:
 

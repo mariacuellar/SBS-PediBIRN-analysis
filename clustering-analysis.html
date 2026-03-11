@@ -94,7 +94,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#latent-class-analysis" id="toc-latent-class-analysis" class="nav-link" data-scroll-target="#latent-class-analysis"><span class="header-section-number">5.2</span> Latent Class Analysis</a></li>
   <li><a href="#age-distribution-by-cluster" id="toc-age-distribution-by-cluster" class="nav-link" data-scroll-target="#age-distribution-by-cluster"><span class="header-section-number">5.3</span> Age Distribution by Cluster</a></li>
   </ul></li>
-  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">6</span> Discussion</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">6</span> Discussion</a>
+  <ul class="collapse">
+  <li><a href="#causal-interpretation" id="toc-causal-interpretation" class="nav-link" data-scroll-target="#causal-interpretation"><span class="header-section-number">6.1</span> Causal Interpretation</a></li>
+  </ul></li>
   <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps"><span class="header-section-number">7</span> Next Steps</a></li>
   </ul>
 </nav>
@@ -154,6 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="data" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Data</h1>
+<p>Chris described this dataset as a set of 420 PediBIRN cases used in the Hymel et al.&nbsp;and Boos et al.&nbsp;papers. His main interest was the Boos 2022 clustering analysis, which used a Gower matrix and produced a two-cluster solution that Boos interpreted as including an abuse-associated cluster. Chris noted, however, that the cluster profiles can also be read differently, because the group Boos interpreted as abuse-associated appears to be heavily characterized by severity of intracranial pathology, including prolonged loss of consciousness and hypoxia. He also noted concerns about the later Boos 2025 mediation analysis, particularly the treatment of outcomes such as loss of consciousness and subdural hemorrhage as if they were exposure proxies. In his own exploratory work, Chris found that a two-class latent class analysis broadly reproduced the Boos clustering pattern, and that a three-class solution appeared to separate cases mainly by increasing levels of loss of consciousness severity, with retinal hemorrhage and subdural hemorrhage increasing across classes. This analysis is therefore motivated both by replication of the Boos clustering results and by the question of whether the main clustering signal reflects abuse specifically or rather the severity of intracranial injury.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dat_control <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"Data/Data.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Eligible Control Patients"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">data_source =</span> <span class="st">"control"</span>)</span>
@@ -1445,7 +1449,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="discussion" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Discussion</h1>
-<p>One way to frame the clustering results causally is to distinguish between an unobserved exposure, an underlying severity process, and the observed clinical features used in clustering. Let (A) denote abuse status or an abuse-related injury mechanism, let (S) denote severity of intracranial or neurologic injury, let (X = (X_1, , X_p)) denote the observed clinical and radiologic variables used in clustering, and let (C) denote the resulting cluster assignment.</p>
+<p>Across the hierarchical clustering and latent class analyses, the same basic pattern appears repeatedly: the main separation between groups is strongly related to neurologic severity, especially loss of consciousness, and is also associated with hypoxic-ischemic swelling and other markers of severe intracranial injury. This makes it difficult to interpret one cluster or class as representing abuse in any simple or direct way. Instead, the results are more consistent with the possibility that the dominant clustering signal reflects severity of intracranial pathology, with abuse-correlated findings co-occurring within that broader severity pattern.</p>
+<p>This does not mean that abuse-related injuries are irrelevant to the clustering structure. Rather, it means that the unsupervised methods used here do not distinguish between a pattern driven by abuse specifically and a pattern driven by downstream manifestations of severe brain injury. In that sense, the present results support a more cautious reading of the Boos analysis: the observed groups may be real statistical groupings, but their interpretation remains uncertain unless supported by external evidence that clearly separates abuse mechanism from injury severity.</p>
+<section id="causal-interpretation" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="causal-interpretation"><span class="header-section-number">6.1</span> Causal Interpretation</h2>
+<p>One way to frame these results causally is to distinguish between an unobserved exposure, an underlying severity process, and the observed clinical features used in clustering. Let (A) denote abuse status or an abuse-related injury mechanism, let (S) denote severity of intracranial or neurologic injury, let (X = (X_1, , X_p)) denote the observed clinical and radiologic variables used in clustering, and let (C) denote the resulting cluster assignment.</p>
 <p>Under this setup, a plausible causal structure is:</p>
 <p>[ A S ]</p>
 <p>[ A X_j ]</p>
@@ -1455,6 +1463,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Equivalently, each observed feature can be written as:</p>
 <p>[ X_j = f_j(A, S, U_j), j = 1, , p ]</p>
 <p>where (U_j) represents other unmeasured causes of feature (X_j). Under this framework, the cluster assignment (C) is not itself a causal variable and should not be interpreted as a direct measure of abuse. Instead, it is a constructed summary of the observed feature vector. If variables such as loss of consciousness, hypoxic-ischemic injury, or retinal hemorrhage are strongly influenced by severity of intracranial pathology, then the clustering may primarily reflect (S) rather than (A). For that reason, even if cluster membership is associated with abuse-related findings, the cluster solution remains descriptive and does not by itself identify an abuse mechanism.</p>
+</section>
 </section>
 <section id="next-steps" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Next Steps</h1>
