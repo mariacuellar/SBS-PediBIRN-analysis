@@ -5,9 +5,6 @@ This repository contains a reanalysis of PediBIRN cases, focusing on whether uns
 ## Main documents
 
 - [Analysis](analysis/clustering-analysis.md)
-- [Analysis source](analysis/clustering-analysis.qmd)
-- [Standalone HTML analysis](analysis/clustering-analysis.html)
-- [Paper source](paper/paper.qmd)
 - [Paper PDF](paper/paper.pdf)
 
 ## Repository structure

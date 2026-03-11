@@ -1,4 +1,52 @@
+---
+title: "Clustering Analysis"
+author: "Maria Cuellar"
+date: today
+format:
+  html:
+    toc: true
+    number-sections: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
 
+
+``` r
+library(tidyverse)
+```
+
+```
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   4.0.0     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+## ✔ purrr     1.1.0     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+``` r
+library(readxl)
+library(cluster)
+library(knitr)
+library(poLCA)
+```
+
+```
+## Loading required package: scatterplot3d
+## Loading required package: MASS
+## 
+## Attaching package: 'MASS'
+## 
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+```
 
 # Overview
 
@@ -18,21 +66,43 @@ The key design choice is that every clustering variable is defined in one place 
 
 Chris described this dataset as a set of 420 PediBIRN cases used in the Hymel et al. and Boos et al. papers. His main interest was the Boos 2022 clustering analysis, which used a Gower matrix and produced a two-cluster solution that Boos interpreted as including an abuse-associated cluster. Chris noted, however, that the cluster profiles can also be read differently, because the group Boos interpreted as abuse-associated appears to be heavily characterized by severity of intracranial pathology, including prolonged loss of consciousness and hypoxia. He also noted concerns about the later Boos 2025 mediation analysis, particularly the treatment of outcomes such as loss of consciousness and subdural hemorrhage as if they were exposure proxies. In his own exploratory work, Chris found that a two-class latent class analysis broadly reproduced the Boos clustering pattern, and that a three-class solution appeared to separate cases mainly by increasing levels of loss of consciousness severity, with retinal hemorrhage and subdural hemorrhage increasing across classes. This analysis is therefore motivated both by replication of the Boos clustering results and by the question of whether the main clustering signal reflects abuse specifically or rather the severity of intracranial injury.
 
-```{r}
+
+``` r
 dat_control <- read_excel("../Data/Data.xlsx", sheet = "Eligible Control Patients") |>
   mutate(data_source = "control")
+```
 
+```
+## New names:
+## • `Eligible?` -> `Eligible?...1`
+## • `Eligible?` -> `Eligible?...91`
+```
+
+``` r
 dat_treatment <- read_excel("../Data/Data.xlsx", sheet = "Eligible Intervention Patients") |>
   mutate(data_source = "intervention")
+```
 
+```
+## New names:
+## • `Eligible?` -> `Eligible?...1`
+## • `Eligible?` -> `Eligible?...214`
+```
+
+``` r
 dat_raw <- bind_rows(dat_control, dat_treatment)
 
 nrow(dat_raw)
 ```
 
+```
+## [1] 432
+```
+
 # Data Preparation
 
-```{r}
+
+``` r
 feature_map <- c(
   patient_id = "Patient ID",
   age_months = "Months",
@@ -60,7 +130,13 @@ feature_map <- c(
 required_columns <- unname(feature_map)
 missing_columns <- setdiff(required_columns, names(dat_raw))
 missing_columns
+```
 
+```
+## character(0)
+```
+
+``` r
 to_binary_factor <- function(x) {
   case_when(
     is.na(x) ~ NA_character_,
@@ -166,13 +242,35 @@ missingness_summary <- dat_cluster |>
 kable(missingness_summary, digits = 2, caption = "Table 1. Clustering variables and missingness")
 ```
 
+
+
+Table: Table 1. Clustering variables and missingness
+
+|variable                     | missing_fraction|
+|:----------------------------|----------------:|
+|diffuse_axonal_injury        |             0.85|
+|respiratory_compromise       |             0.00|
+|circulatory_compromise       |             0.00|
+|seizure                      |             0.00|
+|torso_ear_neck_bruising      |             0.00|
+|loc_severity                 |             0.00|
+|skull_fracture_nonisolated   |             0.00|
+|epidural_hemorrhage          |             0.00|
+|subdural_hemorrhage          |             0.00|
+|complex_sdh_distribution     |             0.00|
+|subarachnoid_hemorrhage      |             0.00|
+|parenchymal_injury           |             0.00|
+|hypoxic_ischemic_swelling    |             0.00|
+|extensive_retinal_hemorrhage |             0.00|
+
 In the data-preparation step, the eligible control and intervention sheets were first combined into a single analysis dataset. I then selected a set of clinical and radiologic variables that most closely matched the features used in the Boos clustering analysis and recoded them into a form suitable for unsupervised clustering. Most variables were converted to binary indicators (`Yes`/`No`), while loss of consciousness was collapsed into an ordinal severity variable with categories for none, resolved before admission, less than or equal to 24 hours after admission, and greater than 24 hours after admission. I also derived a small number of composite variables, such as non-isolated skull fracture and complex subdural hemorrhage distribution, to better capture clinically meaningful patterns. Finally, I reviewed missingness across the selected variables so the clustering results could be interpreted with the degree of data completeness in mind.
 
 The table below lists the variables included in the clustering analysis and shows the proportion of missing values for each one. This provides a quick check of the feature set used to construct the Gower distance matrix and highlights where incomplete data may affect the clustering results.
 
 # Clustering Analysis
 
-```{r}
+
+``` r
 cluster_input <- dat_cluster |>
   dplyr::select(all_of(cluster_vars))
 
@@ -191,7 +289,21 @@ silhouette_tbl <- map_dfr(candidate_k, function(k) {
 })
 
 kable(silhouette_tbl, digits = 3, caption = "Table 2. Average silhouette width by number of clusters")
+```
 
+
+
+Table: Table 2. Average silhouette width by number of clusters
+
+|  k| average_silhouette_width|
+|--:|------------------------:|
+|  2|                    0.265|
+|  3|                    0.191|
+|  4|                    0.178|
+|  5|                    0.182|
+|  6|                    0.185|
+
+``` r
 best_k <- silhouette_tbl |>
   slice_max(average_silhouette_width, n = 1, with_ties = FALSE) |>
   pull(k)
@@ -199,9 +311,14 @@ best_k <- silhouette_tbl |>
 best_k
 ```
 
+```
+## [1] 2
+```
+
 Among the cluster solutions examined, the two-cluster solution had the highest average silhouette width, with a value of 0.265 compared with lower values for three through six clusters. This indicates that, relative to the other candidate solutions, a two-cluster structure provides the best fit to the data under this clustering approach. However, the silhouette value remains fairly low in absolute terms, which suggests that separation between clusters is modest rather than strong. In other words, the data are more consistent with two clusters than with larger numbers of clusters, but they do not show evidence of two sharply distinct or highly natural groupings.
 
-```{r}
+
+``` r
 dat_cluster <- dat_cluster |>
   mutate(
     cluster_2 = relabel_by_loc_severity(cutree(hclust_fit, k = 2), loc_severity),
@@ -213,16 +330,23 @@ dat_cluster <- dat_cluster |>
 
 # Results
 
-```{r}
+
+``` r
 plot(hclust_fit, labels = FALSE, main = "Hierarchical clustering on Gower distance")
 par(lwd = 3)
 rect.hclust(hclust_fit, k = 2, border = 2:3)
+```
+
+![plot of chunk unnamed-chunk-6](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-6-1.png)
+
+``` r
 par(lwd = 1)
 ```
 
 This plot shows the hierarchical clustering structure of the cases based on the Gower dissimilarity matrix. Each branch represents how similar or dissimilar cases are, with branches joining lower in the tree indicating greater similarity. The rectangles show the two-cluster solution obtained by cutting the dendrogram at `k = 2`, which is the solution carried forward for the main cluster summaries below.
 
-```{r}
+
+``` r
 cluster_size_tbl <- dat_cluster |>
   count(cluster_2, name = "n") |>
   mutate(prop = n / sum(n))
@@ -230,7 +354,17 @@ cluster_size_tbl <- dat_cluster |>
 kable(cluster_size_tbl, digits = 3, caption = "Table 3. Cluster sizes for the two-cluster solution")
 ```
 
-```{r}
+
+
+Table: Table 3. Cluster sizes for the two-cluster solution
+
+|cluster_2 |   n|  prop|
+|:---------|---:|-----:|
+|1         |  89| 0.212|
+|2         | 331| 0.788|
+
+
+``` r
 ggplot(cluster_size_tbl, aes(x = cluster_2, y = n, fill = cluster_2)) +
   geom_col(show.legend = FALSE) +
   labs(
@@ -241,9 +375,12 @@ ggplot(cluster_size_tbl, aes(x = cluster_2, y = n, fill = cluster_2)) +
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-8](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-8-1.png)
+
 This plot shows the size of each cluster in the two-cluster solution. It makes the imbalance between the two groups easier to see than the table alone.
 
-```{r}
+
+``` r
 driver_table_binary <- dat_cluster |>
   mutate(across(all_of(cluster_vars[cluster_vars != "loc_severity"]), ~ .x == "Yes")) |>
   pivot_longer(
@@ -279,9 +416,31 @@ driver_table <- bind_rows(driver_table_binary, driver_table_loc) |>
 kable(driver_table, digits = 3, caption = "Table 5. Variables ranked by separation between clusters")
 ```
 
+
+
+Table: Table 5. Variables ranked by separation between clusters
+
+|variable                     | cluster_1| cluster_2| difference| abs_difference|
+|:----------------------------|---------:|---------:|----------:|--------------:|
+|loc_severity_score           |     2.472|     0.833|     -1.639|          1.639|
+|hypoxic_ischemic_swelling    |     0.843|     0.202|     -0.640|          0.640|
+|circulatory_compromise       |     0.742|     0.167|     -0.575|          0.575|
+|respiratory_compromise       |     0.865|     0.312|     -0.553|          0.553|
+|extensive_retinal_hemorrhage |     0.640|     0.230|     -0.411|          0.411|
+|subarachnoid_hemorrhage      |     0.607|     0.224|     -0.383|          0.383|
+|complex_sdh_distribution     |     0.809|     0.453|     -0.356|          0.356|
+|torso_ear_neck_bruising      |     0.393|     0.142|     -0.251|          0.251|
+|parenchymal_injury           |     0.337|     0.103|     -0.234|          0.234|
+|subdural_hemorrhage          |     0.876|     0.680|     -0.197|          0.197|
+|epidural_hemorrhage          |     0.067|     0.169|      0.102|          0.102|
+|diffuse_axonal_injury        |     0.267|     0.294|      0.027|          0.027|
+|seizure                      |     0.348|     0.327|     -0.021|          0.021|
+|skull_fracture_nonisolated   |     0.303|     0.284|     -0.019|          0.019|
+
 This table ranks the clustering variables by how strongly they differ between the two clusters. For the binary variables, the values are the proportion of patients with that feature in each cluster; for `loc_severity_score`, the values are the mean ordinal loss-of-consciousness score, with higher values indicating greater severity. Variables near the top of this table are the most plausible drivers of the two-cluster split, which helps assess whether the separation appears to reflect abuse-related findings, neurologic severity, or some other pattern.
 
-```{r}
+
+``` r
 driver_plot_tbl <- driver_table |>
   mutate(
     variable = fct_reorder(variable, abs_difference)
@@ -302,9 +461,12 @@ ggplot(driver_plot_tbl, aes(x = abs_difference, y = variable, fill = difference 
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-10](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-10-1.png)
+
 This plot visualizes the variables that most strongly distinguish the two clusters. Longer bars indicate larger differences between cluster 1 and cluster 2, making it easier to see whether the separation is being driven primarily by neurologic severity variables, abuse-correlated findings, or a mixture of both.
 
-```{r}
+
+``` r
 table1_loc <- dat_cluster |>
   count(cluster_2, loc_severity) |>
   group_by(cluster_2) |>
@@ -314,7 +476,24 @@ table1_loc <- dat_cluster |>
 kable(table1_loc, digits = 3, caption = "Table 6. Loss-of-consciousness severity by cluster")
 ```
 
-```{r}
+
+
+Table: Table 6. Loss-of-consciousness severity by cluster
+
+|cluster_2 |loc_severity              |   n|  prop|
+|:---------|:-------------------------|---:|-----:|
+|1         |No loss of consciousness  |   5| 0.056|
+|1         |Resolved before admission |  10| 0.112|
+|1         |<=24h after admission     |  12| 0.135|
+|1         |>24h after admission      |  62| 0.697|
+|2         |No loss of consciousness  | 191| 0.577|
+|2         |Resolved before admission |  51| 0.154|
+|2         |<=24h after admission     |  40| 0.121|
+|2         |>24h after admission      |  48| 0.145|
+|2         |NA                        |   1| 0.003|
+
+
+``` r
 ggplot(table1_loc, aes(x = cluster_2, y = prop, fill = loc_severity)) +
   geom_col() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -327,13 +506,16 @@ ggplot(table1_loc, aes(x = cluster_2, y = prop, fill = loc_severity)) +
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-12](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-12-1.png)
+
 This stacked bar chart makes the loss-of-consciousness severity profile of each cluster easier to compare visually. It shows how much each severity category contributes to the composition of each cluster.
 
 This table shows the distribution of loss-of-consciousness severity across the two clusters. In the current results, `loc_severity` appears to be strongly associated with cluster membership: cluster 1 is dominated by patients with loss of consciousness lasting more than 24 hours after admission, whereas cluster 2 is dominated by patients with no loss of consciousness. This suggests that level of neurologic compromise is an important contributor to the observed separation between clusters.
 
 ## Three-Cluster and Four-Cluster Checks
 
-```{r}
+
+``` r
 table_loc_3 <- dat_cluster |>
   count(cluster_3, loc_severity) |>
   group_by(cluster_3) |>
@@ -343,9 +525,30 @@ table_loc_3 <- dat_cluster |>
 kable(table_loc_3, digits = 3, caption = "Table 7. Loss-of-consciousness severity in the three-cluster solution")
 ```
 
+
+
+Table: Table 7. Loss-of-consciousness severity in the three-cluster solution
+
+|cluster_3 |loc_severity              |  n|  prop|
+|:---------|:-------------------------|--:|-----:|
+|1         |No loss of consciousness  |  5| 0.056|
+|1         |Resolved before admission | 10| 0.112|
+|1         |<=24h after admission     | 12| 0.135|
+|1         |>24h after admission      | 62| 0.697|
+|2         |No loss of consciousness  | 96| 0.500|
+|2         |Resolved before admission | 34| 0.177|
+|2         |<=24h after admission     | 18| 0.094|
+|2         |>24h after admission      | 43| 0.224|
+|2         |NA                        |  1| 0.005|
+|3         |No loss of consciousness  | 95| 0.683|
+|3         |Resolved before admission | 17| 0.122|
+|3         |<=24h after admission     | 22| 0.158|
+|3         |>24h after admission      |  5| 0.036|
+
 This table shows the distribution of loss-of-consciousness severity across the three-cluster solution. In the current results, one cluster remains strongly dominated by prolonged loss of consciousness lasting more than 24 hours after admission, while the other two clusters contain much larger proportions of patients with no loss of consciousness. This suggests that loss-of-consciousness severity continues to matter even when the data are partitioned into three clusters.
 
-```{r}
+
+``` r
 table_loc_4 <- dat_cluster |>
   count(cluster_4, loc_severity) |>
   group_by(cluster_4) |>
@@ -355,11 +558,35 @@ table_loc_4 <- dat_cluster |>
 kable(table_loc_4, digits = 3, caption = "Table 8. Loss-of-consciousness severity in the four-cluster solution")
 ```
 
+
+
+Table: Table 8. Loss-of-consciousness severity in the four-cluster solution
+
+|cluster_4 |loc_severity              |  n|  prop|
+|:---------|:-------------------------|--:|-----:|
+|1         |No loss of consciousness  |  5| 0.056|
+|1         |Resolved before admission | 10| 0.112|
+|1         |<=24h after admission     | 12| 0.135|
+|1         |>24h after admission      | 62| 0.697|
+|2         |No loss of consciousness  |  8| 0.105|
+|2         |Resolved before admission | 10| 0.132|
+|2         |<=24h after admission     | 14| 0.184|
+|2         |>24h after admission      | 43| 0.566|
+|2         |NA                        |  1| 0.013|
+|3         |No loss of consciousness  | 95| 0.683|
+|3         |Resolved before admission | 17| 0.122|
+|3         |<=24h after admission     | 22| 0.158|
+|3         |>24h after admission      |  5| 0.036|
+|4         |No loss of consciousness  | 88| 0.759|
+|4         |Resolved before admission | 24| 0.207|
+|4         |<=24h after admission     |  4| 0.034|
+
 This table shows the distribution of loss-of-consciousness severity across the four-cluster solution. In the current results, the four-cluster analysis still retains a cluster dominated by prolonged loss of consciousness, while the other clusters are more concentrated in the lower-severity categories, especially no loss of consciousness. Taken together, the three-cluster and four-cluster solutions suggest that loss of consciousness remains an important organizing feature of the clustering structure rather than being an artifact of forcing only two clusters.
 
 ## Latent Class Analysis
 
-```{r}
+
+``` r
 lca_vars <- c(
   "respiratory_compromise",
   "circulatory_compromise",
@@ -401,9 +628,14 @@ lca_n <- nrow(lca_data)
 lca_n
 ```
 
+```
+## [1] 64
+```
+
 This section applies latent class analysis as an alternative unsupervised method for the same set of categorical variables. Because `poLCA` requires complete data on the manifest variables included in the model, this analysis is restricted to complete cases for the selected feature set.
 
-```{r}
+
+``` r
 lca_formula <- as.formula(
   paste("cbind(", paste(lca_vars, collapse = ", "), ") ~ 1")
 )
@@ -422,7 +654,23 @@ lca_fits <- map(
     calc.se = FALSE
   )
 )
+```
 
+```
+## 
+##  ALERT: at least one manifest variable contained only one
+##     outcome category, and has been removed from the analysis. 
+## 
+## 
+##  ALERT: at least one manifest variable contained only one
+##     outcome category, and has been removed from the analysis. 
+## 
+## 
+##  ALERT: at least one manifest variable contained only one
+##     outcome category, and has been removed from the analysis.
+```
+
+``` r
 lca_fit_tbl <- map2_dfr(
   lca_fits,
   2:4,
@@ -437,7 +685,18 @@ lca_fit_tbl <- map2_dfr(
 kable(lca_fit_tbl, digits = 2, caption = "Table 9. Latent class model fit statistics")
 ```
 
-```{r}
+
+
+Table: Table 9. Latent class model fit statistics
+
+| nclass|     aic|     bic| g_squared|
+|------:|-------:|-------:|---------:|
+|      2| 1048.21| 1115.14|    462.19|
+|      3| 1021.14| 1122.61|    403.12|
+|      4| 1017.60| 1153.61|    367.58|
+
+
+``` r
 ggplot(lca_fit_tbl, aes(x = nclass, y = bic)) +
   geom_line() +
   geom_point(size = 2) +
@@ -450,11 +709,14 @@ ggplot(lca_fit_tbl, aes(x = nclass, y = bic)) +
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-17](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-17-1.png)
+
 This plot shows how the LCA model-fit criterion changes as the number of latent classes increases. Lower values indicate a better tradeoff between fit and complexity, so the lowest point marks the preferred solution by BIC.
 
 This table summarizes model-fit statistics for the latent class models with two, three, and four classes. Lower BIC values indicate a better balance between fit and complexity. In the current results, the two-class LCA solution has the lowest BIC, which is consistent with the earlier hierarchical clustering diagnostics.
 
-```{r}
+
+``` r
 best_lca_k <- lca_fit_tbl |>
   slice_min(bic, n = 1, with_ties = FALSE) |>
   pull(nclass)
@@ -487,9 +749,23 @@ lca_loc_tbl <- lca_results |>
 kable(lca_loc_tbl, digits = 3, caption = "Table 10. Loss-of-consciousness severity in the best-fitting latent class solution")
 ```
 
+
+
+Table: Table 10. Loss-of-consciousness severity in the best-fitting latent class solution
+
+|lca_class | loc_severity|  n|  prop|
+|:---------|------------:|--:|-----:|
+|1         |            2|  2| 0.069|
+|1         |            3|  3| 0.103|
+|1         |            4| 24| 0.828|
+|2         |            1| 26| 0.743|
+|2         |            2|  4| 0.114|
+|2         |            3|  5| 0.143|
+
 This table shows the distribution of loss-of-consciousness severity within the best-fitting latent class solution. In the current results, one latent class is dominated by the highest loss-of-consciousness severity category, while another is dominated by the absence of loss of consciousness. This suggests that the prominence of neurologic severity is not unique to hierarchical clustering and persists under a different unsupervised method.
 
-```{r}
+
+``` r
 lca_item_prob_tbl <- imap_dfr(
   best_lca$probs,
   ~ {
@@ -554,11 +830,14 @@ ggplot(lca_binary_prob_tbl, aes(x = probability, y = fct_rev(variable), color = 
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-19](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-19-1.png)
+
 For this plot, `loc_severity` was simplified into a binary indicator of `any_loss_of_consciousness`, where `No loss of consciousness` was treated as `No` and all other categories were grouped as `Yes`. Under that simplification, the plot shows that loss of consciousness remains one of the features that most clearly separates the latent classes. Together with the class-specific `loc_severity` table above, this suggests that the same basic pattern seen in the hierarchical clustering also appears in the LCA: neurologic severity, and especially loss of consciousness, is a major organizing feature of the latent classes.
 
 ## Age Distribution by Cluster
 
-```{r}
+
+``` r
 age_levels <- c("1 thru 6", "7 thru 12", "13 thru 18", "19 thru 24", "25 thru 32")
 
 age_summary <- dat_cluster |>
@@ -571,9 +850,27 @@ age_summary <- dat_cluster |>
 kable(age_summary, digits = 2, caption = "Table 11. Age-category distribution by cluster")
 ```
 
+
+
+Table: Table 11. Age-category distribution by cluster
+
+|cluster_2 |age_months |  n| prop|
+|:---------|:----------|--:|----:|
+|1         |1 thru 6   | 15| 0.17|
+|1         |7 thru 12  | 13| 0.15|
+|1         |13 thru 18 | 17| 0.19|
+|1         |19 thru 24 | 18| 0.20|
+|1         |25 thru 32 | 26| 0.29|
+|2         |1 thru 6   | 65| 0.20|
+|2         |7 thru 12  | 43| 0.13|
+|2         |13 thru 18 | 64| 0.19|
+|2         |19 thru 24 | 76| 0.23|
+|2         |25 thru 32 | 83| 0.25|
+
 This table shows the age-category distribution within each of the two clusters. In the current results, the age distributions appear fairly similar across clusters, which suggests that age is not a major driver of the observed separation. Because the age field is recorded as categories rather than exact numeric months, this should be interpreted as a coarse comparison of age structure rather than a precise comparison of mean or median age.
 
-```{r}
+
+``` r
 ggplot(age_summary, aes(x = age_months, y = prop, fill = cluster_2)) +
   geom_col(position = "dodge") +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -585,6 +882,8 @@ ggplot(age_summary, aes(x = age_months, y = prop, fill = cluster_2)) +
   ) +
   theme_minimal()
 ```
+
+![plot of chunk unnamed-chunk-21](analysis/clustering-analysis_files/figure-gfm/unnamed-chunk-21-1.png)
 
 This plot visualizes the age-category distribution within each cluster. The similar bar heights across the two groups reinforce the conclusion that age does not appear to meaningfully separate the clusters in the current analysis.
 
