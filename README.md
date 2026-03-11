@@ -8,12 +8,32 @@ Maria Cuellar
     Preparation](#data-preparation)
 - [<span class="toc-section-number">3</span> Hierarchical
   Clustering](#hierarchical-clustering)
-  - [<span class="toc-section-number">3.1</span> Two-Cluster
+  - [<span class="toc-section-number">3.1</span> Selecting the Number of
+    Clusters](#selecting-the-number-of-clusters)
+  - [<span class="toc-section-number">3.2</span> Relabeling Clusters for
+    Interpretation](#relabeling-clusters-for-interpretation)
+  - [<span class="toc-section-number">3.3</span> Two-Cluster
     Solution](#two-cluster-solution)
-  - [<span class="toc-section-number">3.2</span> Three- and Four-Cluster
+    - [<span class="toc-section-number">3.3.1</span>
+      Dendrogram](#dendrogram)
+    - [<span class="toc-section-number">3.3.2</span> Cluster
+      Sizes](#cluster-sizes)
+    - [<span class="toc-section-number">3.3.3</span> Variables Driving
+      Separation](#variables-driving-separation)
+    - [<span class="toc-section-number">3.3.4</span>
+      Loss-of-Consciousness Profile](#loss-of-consciousness-profile)
+  - [<span class="toc-section-number">3.4</span> Three- and Four-Cluster
     Checks](#three--and-four-cluster-checks)
 - [<span class="toc-section-number">4</span> Latent Class
   Analysis](#latent-class-analysis)
+  - [<span class="toc-section-number">4.1</span> Preparing the LCA
+    Dataset](#preparing-the-lca-dataset)
+  - [<span class="toc-section-number">4.2</span> Selecting the Number of
+    Latent Classes](#selecting-the-number-of-latent-classes)
+  - [<span class="toc-section-number">4.3</span> Best-Fitting Latent
+    Class Solution](#best-fitting-latent-class-solution)
+    - [<span class="toc-section-number">4.3.1</span> Binary Feature
+      Probabilities by Class](#binary-feature-probabilities-by-class)
 - [<span class="toc-section-number">5</span> Age
   Comparison](#age-comparison)
 - [<span class="toc-section-number">6</span> Discussion](#discussion)
@@ -261,6 +281,8 @@ results.
 
 # Hierarchical Clustering
 
+## Selecting the Number of Clusters
+
 ``` r
 cluster_input <- dat_cluster |>
   dplyr::select(all_of(cluster_vars))
@@ -313,6 +335,8 @@ strong. In other words, the data are more consistent with two clusters
 than with larger numbers of clusters, but they do not show evidence of
 two sharply distinct or highly natural groupings.
 
+## Relabeling Clusters for Interpretation
+
 ``` r
 dat_cluster <- dat_cluster |>
   mutate(
@@ -324,6 +348,8 @@ dat_cluster <- dat_cluster |>
 ```
 
 ## Two-Cluster Solution
+
+### Dendrogram
 
 ``` r
 plot(hclust_fit, labels = FALSE, main = "Hierarchical clustering on Gower distance")
@@ -343,6 +369,8 @@ dissimilar cases are, with branches joining lower in the tree indicating
 greater similarity. The rectangles show the two-cluster solution
 obtained by cutting the dendrogram at `k = 2`, which is the solution
 carried forward for the main cluster summaries below.
+
+### Cluster Sizes
 
 ``` r
 cluster_size_tbl <- dat_cluster |>
@@ -375,6 +403,8 @@ ggplot(cluster_size_tbl, aes(x = cluster_2, y = n, fill = cluster_2)) +
 This plot shows the size of each cluster in the two-cluster solution. It
 makes the imbalance between the two groups easier to see than the table
 alone.
+
+### Variables Driving Separation
 
 ``` r
 driver_table_binary <- dat_cluster |>
@@ -469,6 +499,8 @@ two clusters. Longer bars indicate larger differences between cluster 1
 and cluster 2, making it easier to see whether the separation is being
 driven primarily by neurologic severity variables, abuse-correlated
 findings, or a mixture of both.
+
+### Loss-of-Consciousness Profile
 
 ``` r
 table1_loc <- dat_cluster |>
@@ -603,6 +635,8 @@ two clusters.
 
 # Latent Class Analysis
 
+## Preparing the LCA Dataset
+
 ``` r
 lca_vars <- c(
   "respiratory_compromise",
@@ -652,6 +686,8 @@ unsupervised method for the same set of categorical variables. Because
 `poLCA` requires complete data on the manifest variables included in the
 model, this analysis is restricted to complete cases for the selected
 feature set.
+
+## Selecting the Number of Latent Classes
 
 ``` r
 lca_formula <- as.formula(
@@ -735,6 +771,8 @@ balance between fit and complexity. In the current results, the
 two-class LCA solution has the lowest BIC, which is consistent with the
 earlier hierarchical clustering diagnostics.
 
+## Best-Fitting Latent Class Solution
+
 ``` r
 best_lca_k <- lca_fit_tbl |>
   slice_min(bic, n = 1, with_ties = FALSE) |>
@@ -787,6 +825,8 @@ severity category, while another is dominated by the absence of loss of
 consciousness. This suggests that the prominence of neurologic severity
 is not unique to hierarchical clustering and persists under a different
 unsupervised method.
+
+### Binary Feature Probabilities by Class
 
 ``` r
 lca_item_prob_tbl <- imap_dfr(
