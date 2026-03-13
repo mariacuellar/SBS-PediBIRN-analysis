@@ -1,10 +1,15 @@
+# README
+
+
 # SBS-PediBIRN Analysis
 
-This repository contains a reanalysis of PediBIRN cases, focusing on whether unsupervised clustering appears to reflect abuse-specific groupings or instead severity of intracranial injury.
+This repository contains a reanalysis of PediBIRN cases, focusing on
+whether unsupervised clustering appears to reflect abuse-specific
+groupings or instead severity of intracranial injury.
 
 ## Main documents
 
-- [Analysis](analysis/clustering-analysis.md)
+- [Analysis](https://mariacuellar.github.io/SBS-PediBIRN-analysis/analysis/clustering-analysis.html)
 - [Paper PDF](paper/paper.pdf)
 
 ## Repository structure
