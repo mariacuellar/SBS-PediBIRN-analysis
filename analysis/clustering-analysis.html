@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Maria Cuellar">
-<meta name="dcterms.date" content="2026-03-11">
+<meta name="dcterms.date" content="2026-03-13">
 
 <title>Clustering Analysis</title>
 <style>
@@ -73,34 +73,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="clustering-analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="clustering-analysis_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
 <body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-  <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
-  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">2</span> Data</a></li>
-  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation"><span class="header-section-number">3</span> Data Preparation</a></li>
-  <li><a href="#clustering-analysis" id="toc-clustering-analysis" class="nav-link" data-scroll-target="#clustering-analysis"><span class="header-section-number">4</span> Clustering Analysis</a></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">5</span> Results</a>
-  <ul class="collapse">
-  <li><a href="#three-cluster-and-four-cluster-checks" id="toc-three-cluster-and-four-cluster-checks" class="nav-link" data-scroll-target="#three-cluster-and-four-cluster-checks"><span class="header-section-number">5.1</span> Three-Cluster and Four-Cluster Checks</a></li>
-  <li><a href="#latent-class-analysis" id="toc-latent-class-analysis" class="nav-link" data-scroll-target="#latent-class-analysis"><span class="header-section-number">5.2</span> Latent Class Analysis</a></li>
-  <li><a href="#age-distribution-by-cluster" id="toc-age-distribution-by-cluster" class="nav-link" data-scroll-target="#age-distribution-by-cluster"><span class="header-section-number">5.3</span> Age Distribution by Cluster</a></li>
-  </ul></li>
-  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">6</span> Discussion</a>
-  <ul class="collapse">
-  <li><a href="#causal-interpretation" id="toc-causal-interpretation" class="nav-link" data-scroll-target="#causal-interpretation"><span class="header-section-number">6.1</span> Causal Interpretation</a></li>
-  </ul></li>
-  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps"><span class="header-section-number">7</span> Next Steps</a></li>
-  </ul>
-</nav>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
 </div>
 <main class="content" id="quarto-document-content">
 
@@ -123,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 11, 2026</p>
+      <p class="date">March 13, 2026</p>
     </div>
   </div>
   
@@ -134,17 +142,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#data" id="toc-data"><span class="header-section-number">2</span> Data</a>
+  <ul>
+  <li><a href="#data-source" id="toc-data-source"><span class="header-section-number">2.1</span> Data Source</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation"><span class="header-section-number">2.2</span> Data Preparation</a></li>
+  </ul></li>
+  <li><a href="#methods" id="toc-methods"><span class="header-section-number">3</span> Methods</a>
+  <ul>
+  <li><a href="#hierarchical-clustering" id="toc-hierarchical-clustering"><span class="header-section-number">3.1</span> Hierarchical Clustering</a></li>
+  <li><a href="#latent-class-analysis" id="toc-latent-class-analysis"><span class="header-section-number">3.2</span> Latent Class Analysis</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results"><span class="header-section-number">4</span> Results</a>
+  <ul>
+  <li><a href="#hierarchical-clustering-results" id="toc-hierarchical-clustering-results"><span class="header-section-number">4.1</span> Hierarchical Clustering Results</a></li>
+  <li><a href="#latent-class-analysis-results" id="toc-latent-class-analysis-results"><span class="header-section-number">4.2</span> Latent Class Analysis Results</a></li>
+  <li><a href="#additional-results" id="toc-additional-results"><span class="header-section-number">4.3</span> Additional Results</a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion"><span class="header-section-number">5</span> Discussion</a>
+  <ul>
+  <li><a href="#causal-interpretation" id="toc-causal-interpretation"><span class="header-section-number">5.1</span> Causal Interpretation</a></li>
+  </ul></li>
+  <li><a href="#next-steps" id="toc-next-steps"><span class="header-section-number">6</span> Next Steps</a></li>
+  </ul>
+</nav>
+<p>We begin by loading the packages used throughout the analysis.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(poLCA)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 <section id="overview" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
-<p>This document replicates the Boos clustering analysis as closely as possible with the variables available in <code>Data/Data.xlsx</code>.</p>
+<p>This document replicates the Boos clustering analysis as closely as possible with the variables available in <code>../Data/Data.xlsx</code>.</p>
 <p>Because the exact feature list and clustering settings from the paper have not yet been fully extracted from the PDF, this file uses an explicit Boos-style approximation:</p>
 <ul>
 <li>Combine the eligible control and intervention sheets into one analysis dataset.</li>
@@ -157,25 +196,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="data" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Data</h1>
+<section id="data-source" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="data-source"><span class="header-section-number">2.1</span> Data Source</h2>
 <p>Chris described this dataset as a set of 420 PediBIRN cases used in the Hymel et al.&nbsp;and Boos et al.&nbsp;papers. His main interest was the Boos 2022 clustering analysis, which used a Gower matrix and produced a two-cluster solution that Boos interpreted as including an abuse-associated cluster. Chris noted, however, that the cluster profiles can also be read differently, because the group Boos interpreted as abuse-associated appears to be heavily characterized by severity of intracranial pathology, including prolonged loss of consciousness and hypoxia. He also noted concerns about the later Boos 2025 mediation analysis, particularly the treatment of outcomes such as loss of consciousness and subdural hemorrhage as if they were exposure proxies. In his own exploratory work, Chris found that a two-class latent class analysis broadly reproduced the Boos clustering pattern, and that a three-class solution appeared to separate cases mainly by increasing levels of loss of consciousness severity, with retinal hemorrhage and subdural hemorrhage increasing across classes. This analysis is therefore motivated both by replication of the Boos clustering results and by the question of whether the main clustering signal reflects abuse specifically or rather the severity of intracranial injury.</p>
+</section>
+<section id="data-preparation" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="data-preparation"><span class="header-section-number">2.2</span> Data Preparation</h2>
+<section id="combining-the-sheets" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="combining-the-sheets"><span class="header-section-number">2.2.1</span> Combining the Sheets</h3>
+<p>We now load the two patient sheets and combine them into a single dataset.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dat_control <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"Data/Data.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Eligible Control Patients"</span>) <span class="sc">|&gt;</span></span>
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dat_control <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"../Data/Data.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Eligible Control Patients"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">data_source =</span> <span class="st">"control"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dat_treatment <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"Data/Data.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Eligible Intervention Patients"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dat_treatment <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"../Data/Data.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Eligible Intervention Patients"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">data_source =</span> <span class="st">"intervention"</span>)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>dat_raw <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(dat_control, dat_treatment)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(dat_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 432</code></pre>
 </div>
 </div>
 </section>
-<section id="data-preparation" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Data Preparation</h1>
+<section id="constructing-the-clustering-variables" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="constructing-the-clustering-variables"><span class="header-section-number">2.2.2</span> Constructing the Clustering Variables</h3>
+<p>We now map the raw spreadsheet columns into the variables used for clustering. We also create the derived severity and injury indicators used later in the analysis.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>feature_map <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">patient_id =</span> <span class="st">"Patient ID"</span>,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_months =</span> <span class="st">"Months"</span>,</span>
@@ -203,9 +256,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>required_columns <span class="ot">&lt;-</span> <span class="fu">unname</span>(feature_map)</span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>missing_columns <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(required_columns, <span class="fu">names</span>(dat_raw))</span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>missing_columns</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>character(0)</code></pre>
 </div>
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>to_binary_factor <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">case_when</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(x) <span class="sc">~</span> <span class="cn">NA_character_</span>,</span>
@@ -309,6 +365,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(missing_fraction))</span>
 <span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(missingness_summary, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Table 1. Clustering variables and missingness"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 1. Clustering variables and missingness</caption>
@@ -382,9 +439,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In the data-preparation step, the eligible control and intervention sheets were first combined into a single analysis dataset. I then selected a set of clinical and radiologic variables that most closely matched the features used in the Boos clustering analysis and recoded them into a form suitable for unsupervised clustering. Most variables were converted to binary indicators (<code>Yes</code>/<code>No</code>), while loss of consciousness was collapsed into an ordinal severity variable with categories for none, resolved before admission, less than or equal to 24 hours after admission, and greater than 24 hours after admission. I also derived a small number of composite variables, such as non-isolated skull fracture and complex subdural hemorrhage distribution, to better capture clinically meaningful patterns. Finally, I reviewed missingness across the selected variables so the clustering results could be interpreted with the degree of data completeness in mind.</p>
 <p>The table below lists the variables included in the clustering analysis and shows the proportion of missing values for each one. This provides a quick check of the feature set used to construct the Gower distance matrix and highlights where incomplete data may affect the clustering results.</p>
 </section>
-<section id="clustering-analysis" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Clustering Analysis</h1>
+</section>
+</section>
+<section id="methods" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Methods</h1>
+<section id="hierarchical-clustering" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="hierarchical-clustering"><span class="header-section-number">3.1</span> Hierarchical Clustering</h2>
+<section id="selecting-the-number-of-clusters" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="selecting-the-number-of-clusters"><span class="header-section-number">3.1.1</span> Selecting the Number of Clusters</h3>
+<p>Here we compute the Gower distance matrix and compare candidate cluster solutions using average silhouette width.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cluster_input <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">all_of</span>(cluster_vars))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -403,6 +469,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>})</span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(silhouette_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 2. Average silhouette width by number of clusters"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 2. Average silhouette width by number of clusters</caption>
@@ -436,17 +503,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </div>
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>best_k <span class="ot">&lt;-</span> silhouette_tbl <span class="sc">|&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(average_silhouette_width, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(k)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>best_k</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2</code></pre>
 </div>
 </div>
 <p>Among the cluster solutions examined, the two-cluster solution had the highest average silhouette width, with a value of 0.265 compared with lower values for three through six clusters. This indicates that, relative to the other candidate solutions, a two-cluster structure provides the best fit to the data under this clustering approach. However, the silhouette value remains fairly low in absolute terms, which suggests that separation between clusters is modest rather than strong. In other words, the data are more consistent with two clusters than with larger numbers of clusters, but they do not show evidence of two sharply distinct or highly natural groupings.</p>
+</section>
+<section id="assigning-cluster-labels" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="assigning-cluster-labels"><span class="header-section-number">3.1.2</span> Assigning Cluster Labels</h3>
+<p>We now apply the chosen clustering solutions and relabel the clusters so that cluster 1 corresponds to the higher-severity profile.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dat_cluster <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cluster_2 =</span> <span class="fu">relabel_by_loc_severity</span>(<span class="fu">cutree</span>(hclust_fit, <span class="at">k =</span> <span class="dv">2</span>), loc_severity),</span>
@@ -454,30 +530,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">cluster_4 =</span> <span class="fu">relabel_by_loc_severity</span>(<span class="fu">cutree</span>(hclust_fit, <span class="at">k =</span> <span class="dv">4</span>), loc_severity),</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">cluster_best =</span> <span class="fu">factor</span>(<span class="fu">cutree</span>(hclust_fit, <span class="at">k =</span> best_k))</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 </section>
-<section id="results" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Results</h1>
+</section>
+<section id="latent-class-analysis" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="latent-class-analysis"><span class="header-section-number">3.2</span> Latent Class Analysis</h2>
+<p>We next use latent class analysis as a complementary, model-based method for the same categorical feature set. The LCA is fit on complete cases only, compares two-, three-, and four-class solutions, and uses BIC to choose the preferred number of classes before relabeling classes so that class 1 corresponds to the higher-severity profile.</p>
+</section>
+</section>
+<section id="results" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Results</h1>
+<section id="hierarchical-clustering-results" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="hierarchical-clustering-results"><span class="header-section-number">4.1</span> Hierarchical Clustering Results</h2>
+<section id="hierarchical-clustering-structure" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="hierarchical-clustering-structure"><span class="header-section-number">4.1.1</span> Hierarchical Clustering Structure</h3>
+<p>We first show the dendrogram produced by the hierarchical clustering algorithm.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hclust_fit, <span class="at">labels =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">"Hierarchical clustering on Gower distance"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">lwd =</span> <span class="dv">3</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rect.hclust</span>(hclust_fit, <span class="at">k =</span> <span class="dv">2</span>, <span class="at">border =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="clustering-analysis_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="clustering-analysis_files/figure-html/dendrogram-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Hierarchical clustering dendrogram based on Gower distance.</figcaption>
 </figure>
 </div>
 </div>
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">lwd =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 <p>This plot shows the hierarchical clustering structure of the cases based on the Gower dissimilarity matrix. Each branch represents how similar or dissimilar cases are, with branches joining lower in the tree indicating greater similarity. The rectangles show the two-cluster solution obtained by cutting the dendrogram at <code>k = 2</code>, which is the solution carried forward for the main cluster summaries below.</p>
+</section>
+<section id="cluster-size" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="cluster-size"><span class="header-section-number">4.1.2</span> Cluster Size</h3>
+<p>We next summarize the number of cases in each of the two clusters.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>cluster_size_tbl <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(cluster_2, <span class="at">name =</span> <span class="st">"n"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(cluster_size_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 3. Cluster sizes for the two-cluster solution"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 3. Cluster sizes for the two-cluster solution</caption>
@@ -503,7 +605,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
+<p>We then show the same cluster-size comparison visually.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cluster_size_tbl, <span class="fu">aes</span>(<span class="at">x =</span> cluster_2, <span class="at">y =</span> n, <span class="at">fill =</span> cluster_2)) <span class="sc">+</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
@@ -512,16 +617,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of cases"</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="clustering-analysis_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="clustering-analysis_files/figure-html/cluster-size-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Cluster sizes for the two-cluster hierarchical solution.</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>This plot shows the size of each cluster in the two-cluster solution. It makes the imbalance between the two groups easier to see than the table alone.</p>
+</section>
+<section id="variables-driving-separation" class="level3" data-number="4.1.3">
+<h3 data-number="4.1.3" class="anchored" data-anchor-id="variables-driving-separation"><span class="header-section-number">4.1.3</span> Variables Driving Separation</h3>
+<p>We now rank the variables by how strongly they differ between the two clusters.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>driver_table_binary <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(cluster_vars[cluster_vars <span class="sc">!=</span> <span class="st">"loc_severity"</span>]), <span class="sc">~</span> .x <span class="sc">==</span> <span class="st">"Yes"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
@@ -555,6 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(abs_difference))</span>
 <span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(driver_table, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 5. Variables ranked by separation between clusters"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 5. Variables ranked by separation between clusters</caption>
@@ -678,7 +792,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>This table ranks the clustering variables by how strongly they differ between the two clusters. For the binary variables, the values are the proportion of patients with that feature in each cluster; for <code>loc_severity_score</code>, the values are the mean ordinal loss-of-consciousness score, with higher values indicating greater severity. Variables near the top of this table are the most plausible drivers of the two-cluster split, which helps assess whether the separation appears to reflect abuse-related findings, neurologic severity, or some other pattern.</p>
+<p>We then display those separating variables visually.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>driver_plot_tbl <span class="ot">&lt;-</span> driver_table <span class="sc">|&gt;</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> <span class="fu">fct_reorder</span>(variable, abs_difference)</span>
@@ -697,16 +814,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="clustering-analysis_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="clustering-analysis_files/figure-html/driver-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Variables most strongly separating the two hierarchical clusters.</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>This plot visualizes the variables that most strongly distinguish the two clusters. Longer bars indicate larger differences between cluster 1 and cluster 2, making it easier to see whether the separation is being driven primarily by neurologic severity variables, abuse-correlated findings, or a mixture of both.</p>
+</section>
+<section id="loss-of-consciousness-profile" class="level3" data-number="4.1.4">
+<h3 data-number="4.1.4" class="anchored" data-anchor-id="loss-of-consciousness-profile"><span class="header-section-number">4.1.4</span> Loss-of-Consciousness Profile</h3>
+<p>We now examine how loss-of-consciousness severity is distributed across the two clusters.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>table1_loc <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(cluster_2, loc_severity) <span class="sc">|&gt;</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster_2) <span class="sc">|&gt;</span></span>
@@ -714,6 +839,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(table1_loc, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 6. Loss-of-consciousness severity by cluster"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 6. Loss-of-consciousness severity by cluster</caption>
@@ -784,7 +910,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
+<p>We then show the same loss-of-consciousness pattern in a stacked bar chart.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(table1_loc, <span class="fu">aes</span>(<span class="at">x =</span> cluster_2, <span class="at">y =</span> prop, <span class="at">fill =</span> loc_severity)) <span class="sc">+</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(<span class="at">accuracy =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
@@ -795,19 +924,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"LOC severity"</span></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="clustering-analysis_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="clustering-analysis_files/figure-html/loc-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Loss-of-consciousness severity by hierarchical cluster.</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>This stacked bar chart makes the loss-of-consciousness severity profile of each cluster easier to compare visually. It shows how much each severity category contributes to the composition of each cluster.</p>
-<p>This table shows the distribution of loss-of-consciousness severity across the two clusters. In the current results, <code>loc_severity</code> appears to be strongly associated with cluster membership: cluster 1 is dominated by patients with loss of consciousness lasting more than 24 hours after admission, whereas cluster 2 is dominated by patients with no loss of consciousness. This suggests that level of neurologic compromise is an important contributor to the observed separation between clusters.</p>
-<section id="three-cluster-and-four-cluster-checks" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="three-cluster-and-four-cluster-checks"><span class="header-section-number">5.1</span> Three-Cluster and Four-Cluster Checks</h2>
+<p>Table 6 shows the distribution of loss-of-consciousness severity across the two clusters. In the current results, <code>loc_severity</code> is strongly associated with cluster membership: cluster 1 is dominated by patients with loss of consciousness lasting more than 24 hours after admission, whereas cluster 2 is dominated by patients with no loss of consciousness.</p>
+<p>Figure <strong>?@fig-loc-plot</strong> shows the same pattern visually. The sharp contrast between the two stacked bars suggests that neurologic severity is a major driver of the clustering structure.</p>
+</section>
+<section id="sensitivity-checks" class="level3" data-number="4.1.5">
+<h3 data-number="4.1.5" class="anchored" data-anchor-id="sensitivity-checks"><span class="header-section-number">4.1.5</span> Sensitivity Checks</h3>
+<section id="three-cluster-solution" class="level4" data-number="4.1.5.1">
+<h4 data-number="4.1.5.1" class="anchored" data-anchor-id="three-cluster-solution"><span class="header-section-number">4.1.5.1</span> Three-Cluster Solution</h4>
+<p>We now check whether loss-of-consciousness severity still structures the data when three clusters are allowed.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>table_loc_3 <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(cluster_3, loc_severity) <span class="sc">|&gt;</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster_3) <span class="sc">|&gt;</span></span>
@@ -815,6 +952,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(table_loc_3, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 7. Loss-of-consciousness severity in the three-cluster solution"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 7. Loss-of-consciousness severity in the three-cluster solution</caption>
@@ -910,7 +1048,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>This table shows the distribution of loss-of-consciousness severity across the three-cluster solution. In the current results, one cluster remains strongly dominated by prolonged loss of consciousness lasting more than 24 hours after admission, while the other two clusters contain much larger proportions of patients with no loss of consciousness. This suggests that loss-of-consciousness severity continues to matter even when the data are partitioned into three clusters.</p>
+</section>
+<section id="four-cluster-solution" class="level4" data-number="4.1.5.2">
+<h4 data-number="4.1.5.2" class="anchored" data-anchor-id="four-cluster-solution"><span class="header-section-number">4.1.5.2</span> Four-Cluster Solution</h4>
+<p>We then repeat the same check for a four-cluster solution.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>table_loc_4 <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(cluster_4, loc_severity) <span class="sc">|&gt;</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster_4) <span class="sc">|&gt;</span></span>
@@ -918,6 +1062,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(table_loc_4, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 8. Loss-of-consciousness severity in the four-cluster solution"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 8. Loss-of-consciousness severity in the four-cluster solution</caption>
@@ -1032,9 +1177,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>This table shows the distribution of loss-of-consciousness severity across the four-cluster solution. In the current results, the four-cluster analysis still retains a cluster dominated by prolonged loss of consciousness, while the other clusters are more concentrated in the lower-severity categories, especially no loss of consciousness. Taken together, the three-cluster and four-cluster solutions suggest that loss of consciousness remains an important organizing feature of the clustering structure rather than being an artifact of forcing only two clusters.</p>
 </section>
-<section id="latent-class-analysis" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="latent-class-analysis"><span class="header-section-number">5.2</span> Latent Class Analysis</h2>
+</section>
+</section>
+<section id="latent-class-analysis-results" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="latent-class-analysis-results"><span class="header-section-number">4.2</span> Latent Class Analysis Results</h2>
+<section id="complete-case-dataset" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="complete-case-dataset"><span class="header-section-number">4.2.1</span> Complete-Case Dataset</h3>
+<p>We now recode the clustering variables into the categorical format required for latent class analysis.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lca_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"respiratory_compromise"</span>,</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"circulatory_compromise"</span>,</span>
@@ -1074,12 +1226,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>lca_n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(lca_data)</span>
 <span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>lca_n</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 64</code></pre>
 </div>
 </div>
 <p>This section applies latent class analysis as an alternative unsupervised method for the same set of categorical variables. Because <code>poLCA</code> requires complete data on the manifest variables included in the model, this analysis is restricted to complete cases for the selected feature set.</p>
+</section>
+<section id="model-fit" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="model-fit"><span class="header-section-number">4.2.2</span> Model Fit</h3>
+<p>We next fit latent class models with different numbers of classes and compare their fit statistics.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lca_formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">"cbind("</span>, <span class="fu">paste</span>(lca_vars, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">") ~ 1"</span>)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1088,41 +1247,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>lca_fits <span class="ot">&lt;-</span> <span class="fu">map</span>(</span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>,</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">poLCA</span>(</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    lca_formula,</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> lca_data,</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">nclass =</span> .x,</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">nrep =</span> <span class="dv">5</span>,</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxiter =</span> <span class="dv">3000</span>,</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">calc.se =</span> <span class="cn">FALSE</span></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
- ALERT: at least one manifest variable contained only one
-    outcome category, and has been removed from the analysis. 
-
-
- ALERT: at least one manifest variable contained only one
-    outcome category, and has been removed from the analysis. 
-
-
- ALERT: at least one manifest variable contained only one
-    outcome category, and has been removed from the analysis. </code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lca_fit_tbl <span class="ot">&lt;-</span> <span class="fu">map2_dfr</span>(</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  lca_fits,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">tibble</span>(</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">nclass =</span> .y,</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">aic =</span> .x<span class="sc">$</span>aic,</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">bic =</span> .x<span class="sc">$</span>bic,</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">g_squared =</span> .x<span class="sc">$</span>Gsq</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(lca_fit_tbl, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Table 9. Latent class model fit statistics"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> {</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    fit <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">capture.output</span>(</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>      fit <span class="ot">&lt;-</span> <span class="fu">poLCA</span>(</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>        lca_formula,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> lca_data,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">nclass =</span> .x,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrep =</span> <span class="dv">5</span>,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">maxiter =</span> <span class="dv">3000</span>,</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">calc.se =</span> <span class="cn">FALSE</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    fit</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>lca_fit_tbl <span class="ot">&lt;-</span> <span class="fu">map2_dfr</span>(</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>  lca_fits,</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>,</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">tibble</span>(</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">nclass =</span> .y,</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">aic =</span> .x<span class="sc">$</span>aic,</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">bic =</span> .x<span class="sc">$</span>bic,</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">g_squared =</span> .x<span class="sc">$</span>Gsq</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(lca_fit_tbl, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Table 9. Latent class model fit statistics"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 9. Latent class model fit statistics</caption>
@@ -1157,58 +1311,70 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
+<p>We then show the BIC values across the candidate latent class models.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lca_fit_tbl, <span class="fu">aes</span>(<span class="at">x =</span> nclass, <span class="at">y =</span> bic)) <span class="sc">+</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> lca_fit_tbl<span class="sc">$</span>nclass) <span class="sc">+</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"LCA model fit by number of classes"</span>,</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Number of latent classes"</span>,</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"BIC"</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lca_fit_tbl, <span class="fu">aes</span>(<span class="at">x =</span> nclass, <span class="at">y =</span> bic)) <span class="sc">+</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> lca_fit_tbl<span class="sc">$</span>nclass) <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"LCA model fit by number of classes"</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Number of latent classes"</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"BIC"</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="clustering-analysis_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="clustering-analysis_files/figure-html/lca-bic-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>BIC values for latent class models with two, three, and four classes.</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>This plot shows how the LCA model-fit criterion changes as the number of latent classes increases. Lower values indicate a better tradeoff between fit and complexity, so the lowest point marks the preferred solution by BIC.</p>
 <p>This table summarizes model-fit statistics for the latent class models with two, three, and four classes. Lower BIC values indicate a better balance between fit and complexity. In the current results, the two-class LCA solution has the lowest BIC, which is consistent with the earlier hierarchical clustering diagnostics.</p>
+</section>
+<section id="best-fitting-solution" class="level3" data-number="4.2.3">
+<h3 data-number="4.2.3" class="anchored" data-anchor-id="best-fitting-solution"><span class="header-section-number">4.2.3</span> Best-Fitting Solution</h3>
+<p>We now extract the best-fitting latent class solution and summarize the distribution of loss-of-consciousness severity within it.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>best_lca_k <span class="ot">&lt;-</span> lca_fit_tbl <span class="sc">|&gt;</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(bic, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(nclass)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>best_lca <span class="ot">&lt;-</span> lca_fits[[best_lca_k <span class="sc">-</span> <span class="dv">1</span>]]</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>lca_results <span class="ot">&lt;-</span> lca_data <span class="sc">|&gt;</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lca_class_raw =</span> <span class="fu">factor</span>(best_lca<span class="sc">$</span>predclass))</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>lca_class_map <span class="ot">&lt;-</span> lca_results <span class="sc">|&gt;</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lca_class_raw) <span class="sc">|&gt;</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_loc_score =</span> <span class="fu">mean</span>(loc_severity, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_loc_score), lca_class_raw)</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>lca_results <span class="ot">&lt;-</span> lca_results <span class="sc">|&gt;</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">lca_class =</span> <span class="fu">factor</span>(</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>      lca_class_raw,</span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> lca_class_map<span class="sc">$</span>lca_class_raw,</span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(lca_class_map))</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>lca_loc_tbl <span class="ot">&lt;-</span> lca_results <span class="sc">|&gt;</span></span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(lca_class, loc_severity) <span class="sc">|&gt;</span></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lca_class) <span class="sc">|&gt;</span></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(lca_loc_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 10. Loss-of-consciousness severity in the best-fitting latent class solution"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>best_lca_k <span class="ot">&lt;-</span> lca_fit_tbl <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(bic, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(nclass)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>best_lca <span class="ot">&lt;-</span> lca_fits[[best_lca_k <span class="sc">-</span> <span class="dv">1</span>]]</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>lca_results <span class="ot">&lt;-</span> lca_data <span class="sc">|&gt;</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lca_class_raw =</span> <span class="fu">factor</span>(best_lca<span class="sc">$</span>predclass))</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>lca_class_map <span class="ot">&lt;-</span> lca_results <span class="sc">|&gt;</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lca_class_raw) <span class="sc">|&gt;</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_loc_score =</span> <span class="fu">mean</span>(loc_severity, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_loc_score), lca_class_raw)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>lca_results <span class="ot">&lt;-</span> lca_results <span class="sc">|&gt;</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">lca_class =</span> <span class="fu">factor</span>(</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>      lca_class_raw,</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> lca_class_map<span class="sc">$</span>lca_class_raw,</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(lca_class_map))</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>lca_loc_tbl <span class="ot">&lt;-</span> lca_results <span class="sc">|&gt;</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(lca_class, loc_severity) <span class="sc">|&gt;</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lca_class) <span class="sc">|&gt;</span></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(lca_loc_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 10. Loss-of-consciousness severity in the best-fitting latent class solution"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 10. Loss-of-consciousness severity in the best-fitting latent class solution</caption>
@@ -1262,92 +1428,106 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>This table shows the distribution of loss-of-consciousness severity within the best-fitting latent class solution. In the current results, one latent class is dominated by the highest loss-of-consciousness severity category, while another is dominated by the absence of loss of consciousness. This suggests that the prominence of neurologic severity is not unique to hierarchical clustering and persists under a different unsupervised method.</p>
+<p>We then show the class-specific probabilities for the binary features in the best-fitting LCA model.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>lca_item_prob_tbl <span class="ot">&lt;-</span> <span class="fu">imap_dfr</span>(</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  best_lca<span class="sc">$</span>probs,</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> {</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    prob_mat <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(.x)</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    prob_mat<span class="sc">$</span>class_raw <span class="ot">&lt;-</span> <span class="fu">rownames</span>(prob_mat)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    prob_mat <span class="sc">|&gt;</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_longer</span>(</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"Pr("</span>),</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">names_to =</span> <span class="st">"response"</span>,</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">values_to =</span> <span class="st">"probability"</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">variable =</span> .y)</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">response =</span> <span class="fu">factor</span>(response, <span class="at">levels =</span> <span class="fu">unique</span>(response)),</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">class_raw =</span> <span class="fu">factor</span>(class_raw, <span class="at">levels =</span> <span class="fu">rownames</span>(best_lca<span class="sc">$</span>probs[[<span class="dv">1</span>]]))</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>lca_plot_class_map <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">class_raw =</span> <span class="fu">factor</span>(</span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">"class "</span>, <span class="fu">as.character</span>(lca_class_map<span class="sc">$</span>lca_class_raw), <span class="st">": "</span>),</span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">levels</span>(lca_item_prob_tbl<span class="sc">$</span>class_raw)</span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">class =</span> <span class="fu">factor</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(lca_class_map)))</span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>lca_binary_prob_tbl <span class="ot">&lt;-</span> lca_item_prob_tbl <span class="sc">|&gt;</span></span>
-<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>    (variable <span class="sc">!=</span> <span class="st">"loc_severity"</span> <span class="sc">&amp;</span> response <span class="sc">==</span> <span class="st">"Pr(2)"</span>) <span class="sc">|</span></span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>      (variable <span class="sc">==</span> <span class="st">"loc_severity"</span> <span class="sc">&amp;</span> response <span class="sc">!=</span> <span class="st">"Pr(1)"</span>)</span>
-<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> <span class="fu">if_else</span>(variable <span class="sc">==</span> <span class="st">"loc_severity"</span>, <span class="st">"any_loss_of_consciousness"</span>, variable)</span>
-<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(lca_plot_class_map, <span class="at">by =</span> <span class="st">"class_raw"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(class, variable) <span class="sc">|&gt;</span></span>
-<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">probability =</span> <span class="fu">sum</span>(probability), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(variable) <span class="sc">|&gt;</span></span>
-<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">class1_probability =</span> probability[class <span class="sc">==</span> <span class="st">"1"</span>][<span class="dv">1</span>]</span>
-<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>lca_variable_order <span class="ot">&lt;-</span> lca_binary_prob_tbl <span class="sc">|&gt;</span></span>
-<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(variable, class1_probability) <span class="sc">|&gt;</span></span>
-<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(class1_probability)) <span class="sc">|&gt;</span></span>
-<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(variable)</span>
-<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a>lca_binary_prob_tbl <span class="ot">&lt;-</span> lca_binary_prob_tbl <span class="sc">|&gt;</span></span>
-<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="fu">factor</span>(variable, <span class="at">levels =</span> lca_variable_order))</span>
-<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-53"><a href="#cb28-53" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lca_binary_prob_tbl, <span class="fu">aes</span>(<span class="at">x =</span> probability, <span class="at">y =</span> <span class="fu">fct_rev</span>(variable), <span class="at">color =</span> class)) <span class="sc">+</span></span>
-<span id="cb28-54"><a href="#cb28-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb28-55"><a href="#cb28-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#1f78b4"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"#e31a1c"</span>)) <span class="sc">+</span></span>
-<span id="cb28-56"><a href="#cb28-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb28-57"><a href="#cb28-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Probability of each binary feature by latent class"</span>,</span>
-<span id="cb28-58"><a href="#cb28-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Estimated probability that the feature is present"</span>,</span>
-<span id="cb28-59"><a href="#cb28-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb28-60"><a href="#cb28-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Latent class"</span></span>
-<span id="cb28-61"><a href="#cb28-61" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb28-62"><a href="#cb28-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>lca_item_prob_tbl <span class="ot">&lt;-</span> <span class="fu">imap_dfr</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  best_lca<span class="sc">$</span>probs,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> {</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    prob_mat <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(.x)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    prob_mat<span class="sc">$</span>class_raw <span class="ot">&lt;-</span> <span class="fu">rownames</span>(prob_mat)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    prob_mat <span class="sc">|&gt;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_longer</span>(</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"Pr("</span>),</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">names_to =</span> <span class="st">"response"</span>,</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">values_to =</span> <span class="st">"probability"</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">|&gt;</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">variable =</span> .y)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">response =</span> <span class="fu">factor</span>(response, <span class="at">levels =</span> <span class="fu">unique</span>(response)),</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">class_raw =</span> <span class="fu">factor</span>(class_raw, <span class="at">levels =</span> <span class="fu">rownames</span>(best_lca<span class="sc">$</span>probs[[<span class="dv">1</span>]]))</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>lca_plot_class_map <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">class_raw =</span> <span class="fu">factor</span>(</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">"class "</span>, <span class="fu">as.character</span>(lca_class_map<span class="sc">$</span>lca_class_raw), <span class="st">": "</span>),</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">levels</span>(lca_item_prob_tbl<span class="sc">$</span>class_raw)</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">class =</span> <span class="fu">factor</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(lca_class_map)))</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>lca_binary_prob_tbl <span class="ot">&lt;-</span> lca_item_prob_tbl <span class="sc">|&gt;</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    (variable <span class="sc">!=</span> <span class="st">"loc_severity"</span> <span class="sc">&amp;</span> response <span class="sc">==</span> <span class="st">"Pr(2)"</span>) <span class="sc">|</span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>      (variable <span class="sc">==</span> <span class="st">"loc_severity"</span> <span class="sc">&amp;</span> response <span class="sc">!=</span> <span class="st">"Pr(1)"</span>)</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> <span class="fu">if_else</span>(variable <span class="sc">==</span> <span class="st">"loc_severity"</span>, <span class="st">"any_loss_of_consciousness"</span>, variable)</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(lca_plot_class_map, <span class="at">by =</span> <span class="st">"class_raw"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(class, variable) <span class="sc">|&gt;</span></span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">probability =</span> <span class="fu">sum</span>(probability), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(variable) <span class="sc">|&gt;</span></span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">class1_probability =</span> probability[class <span class="sc">==</span> <span class="st">"1"</span>][<span class="dv">1</span>]</span>
+<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>lca_variable_order <span class="ot">&lt;-</span> lca_binary_prob_tbl <span class="sc">|&gt;</span></span>
+<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(variable, class1_probability) <span class="sc">|&gt;</span></span>
+<span id="cb26-47"><a href="#cb26-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(class1_probability)) <span class="sc">|&gt;</span></span>
+<span id="cb26-48"><a href="#cb26-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(variable)</span>
+<span id="cb26-49"><a href="#cb26-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-50"><a href="#cb26-50" aria-hidden="true" tabindex="-1"></a>lca_binary_prob_tbl <span class="ot">&lt;-</span> lca_binary_prob_tbl <span class="sc">|&gt;</span></span>
+<span id="cb26-51"><a href="#cb26-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="fu">factor</span>(variable, <span class="at">levels =</span> lca_variable_order))</span>
+<span id="cb26-52"><a href="#cb26-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-53"><a href="#cb26-53" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lca_binary_prob_tbl, <span class="fu">aes</span>(<span class="at">x =</span> probability, <span class="at">y =</span> <span class="fu">fct_rev</span>(variable), <span class="at">color =</span> class)) <span class="sc">+</span></span>
+<span id="cb26-54"><a href="#cb26-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb26-55"><a href="#cb26-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#1f78b4"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"#e31a1c"</span>)) <span class="sc">+</span></span>
+<span id="cb26-56"><a href="#cb26-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb26-57"><a href="#cb26-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Probability of each binary feature by latent class"</span>,</span>
+<span id="cb26-58"><a href="#cb26-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Estimated probability that the feature is present"</span>,</span>
+<span id="cb26-59"><a href="#cb26-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb26-60"><a href="#cb26-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Latent class"</span></span>
+<span id="cb26-61"><a href="#cb26-61" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb26-62"><a href="#cb26-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="clustering-analysis_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="clustering-analysis_files/figure-html/lca-binary-probability-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Estimated binary feature probabilities in the best-fitting latent class model.</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>For this plot, <code>loc_severity</code> was simplified into a binary indicator of <code>any_loss_of_consciousness</code>, where <code>No loss of consciousness</code> was treated as <code>No</code> and all other categories were grouped as <code>Yes</code>. Under that simplification, the plot shows that loss of consciousness remains one of the features that most clearly separates the latent classes. Together with the class-specific <code>loc_severity</code> table above, this suggests that the same basic pattern seen in the hierarchical clustering also appears in the LCA: neurologic severity, and especially loss of consciousness, is a major organizing feature of the latent classes.</p>
 </section>
-<section id="age-distribution-by-cluster" class="level2" data-number="5.3">
-<h2 data-number="5.3" class="anchored" data-anchor-id="age-distribution-by-cluster"><span class="header-section-number">5.3</span> Age Distribution by Cluster</h2>
+</section>
+<section id="additional-results" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="additional-results"><span class="header-section-number">4.3</span> Additional Results</h2>
+<section id="age-distribution-by-cluster" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="age-distribution-by-cluster"><span class="header-section-number">4.3.1</span> Age Distribution by Cluster</h3>
+<section id="age-categories-across-the-two-main-clusters" class="level4" data-number="4.3.1.1">
+<h4 data-number="4.3.1.1" class="anchored" data-anchor-id="age-categories-across-the-two-main-clusters"><span class="header-section-number">4.3.1.1</span> Age Categories Across the Two Main Clusters</h4>
+<p>We finish by checking whether age differs meaningfully across the two main clusters.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>age_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"1 thru 6"</span>, <span class="st">"7 thru 12"</span>, <span class="st">"13 thru 18"</span>, <span class="st">"19 thru 24"</span>, <span class="st">"25 thru 32"</span>)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>age_summary <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_months =</span> <span class="fu">factor</span>(age_months, <span class="at">levels =</span> age_levels, <span class="at">ordered =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(cluster_2, age_months) <span class="sc">|&gt;</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster_2) <span class="sc">|&gt;</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(age_summary, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Table 11. Age-category distribution by cluster"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>age_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"1 thru 6"</span>, <span class="st">"7 thru 12"</span>, <span class="st">"13 thru 18"</span>, <span class="st">"19 thru 24"</span>, <span class="st">"25 thru 32"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>age_summary <span class="ot">&lt;-</span> dat_cluster <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_months =</span> <span class="fu">factor</span>(age_months, <span class="at">levels =</span> age_levels, <span class="at">ordered =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(cluster_2, age_months) <span class="sc">|&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster_2) <span class="sc">|&gt;</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(age_summary, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Table 11. Age-category distribution by cluster"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Table 11. Age-category distribution by cluster</caption>
@@ -1425,21 +1605,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>This table shows the age-category distribution within each of the two clusters. In the current results, the age distributions appear fairly similar across clusters, which suggests that age is not a major driver of the observed separation. Because the age field is recorded as categories rather than exact numeric months, this should be interpreted as a coarse comparison of age structure rather than a precise comparison of mean or median age.</p>
+<p>We then show the age-category comparison visually.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(age_summary, <span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> prop, <span class="at">fill =</span> cluster_2)) <span class="sc">+</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(<span class="at">accuracy =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Age distribution across the two clusters"</span>,</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age category (months)"</span>,</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion within cluster"</span>,</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Cluster"</span></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(age_summary, <span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> prop, <span class="at">fill =</span> cluster_2)) <span class="sc">+</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(<span class="at">accuracy =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Age distribution across the two clusters"</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age category (months)"</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion within cluster"</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Cluster"</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="clustering-analysis_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="clustering-analysis_files/figure-html/age-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Age-category distribution across the two main hierarchical clusters.</figcaption>
 </figure>
 </div>
 </div>
@@ -1447,26 +1632,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This plot visualizes the age-category distribution within each cluster. The similar bar heights across the two groups reinforce the conclusion that age does not appear to meaningfully separate the clusters in the current analysis.</p>
 </section>
 </section>
-<section id="discussion" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Discussion</h1>
+</section>
+</section>
+<section id="discussion" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Discussion</h1>
 <p>Across the hierarchical clustering and latent class analyses, the same basic pattern appears repeatedly: the main separation between groups is strongly related to neurologic severity, especially loss of consciousness, and is also associated with hypoxic-ischemic swelling and other markers of severe intracranial injury. This makes it difficult to interpret one cluster or class as representing abuse in any simple or direct way. Instead, the results are more consistent with the possibility that the dominant clustering signal reflects severity of intracranial pathology, with abuse-correlated findings co-occurring within that broader severity pattern.</p>
 <p>This does not mean that abuse-related injuries are irrelevant to the clustering structure. Rather, it means that the unsupervised methods used here do not distinguish between a pattern driven by abuse specifically and a pattern driven by downstream manifestations of severe brain injury. In that sense, the present results support a more cautious reading of the Boos analysis: the observed groups may be real statistical groupings, but their interpretation remains uncertain unless supported by external evidence that clearly separates abuse mechanism from injury severity.</p>
-<section id="causal-interpretation" class="level2" data-number="6.1">
-<h2 data-number="6.1" class="anchored" data-anchor-id="causal-interpretation"><span class="header-section-number">6.1</span> Causal Interpretation</h2>
-<p>One way to frame these results causally is to distinguish between an unobserved exposure, an underlying severity process, and the observed clinical features used in clustering. Let (A) denote abuse status or an abuse-related injury mechanism, let (S) denote severity of intracranial or neurologic injury, let (X = (X_1, , X_p)) denote the observed clinical and radiologic variables used in clustering, and let (C) denote the resulting cluster assignment.</p>
-<p>Under this setup, a plausible causal structure is:</p>
-<p>[ A S ]</p>
-<p>[ A X_j ]</p>
-<p>[ S X_j, j = 1, , p ]</p>
+<section id="causal-interpretation" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="causal-interpretation"><span class="header-section-number">5.1</span> Causal Interpretation</h2>
+<p>One way to frame these results causally is to distinguish between an unobserved exposure, an underlying severity process, and the observed clinical features used in clustering. Let <span class="math inline">\(A\)</span> denote abuse status or an abuse-related injury mechanism, let <span class="math inline">\(S\)</span> denote severity of intracranial or neurologic injury, let <span class="math inline">\(X = (X_1, \dots, X_p)\)</span> denote the observed clinical and radiologic variables used in clustering, and let <span class="math inline">\(C\)</span> denote the resulting cluster assignment.</p>
+<p>Under this setup, a plausible causal structure is</p>
+<p><span class="math display">\[
+\begin{aligned}
+A &amp;\rightarrow S \\
+A &amp;\rightarrow X_j, \quad j = 1, \dots, p \\
+S &amp;\rightarrow X_j, \quad j = 1, \dots, p
+\end{aligned}
+\]</span></p>
 <p>and the clustering itself is a deterministic function of the observed variables:</p>
-<p>[ C = g(X_1, , X_p) ]</p>
-<p>Equivalently, each observed feature can be written as:</p>
-<p>[ X_j = f_j(A, S, U_j), j = 1, , p ]</p>
-<p>where (U_j) represents other unmeasured causes of feature (X_j). Under this framework, the cluster assignment (C) is not itself a causal variable and should not be interpreted as a direct measure of abuse. Instead, it is a constructed summary of the observed feature vector. If variables such as loss of consciousness, hypoxic-ischemic injury, or retinal hemorrhage are strongly influenced by severity of intracranial pathology, then the clustering may primarily reflect (S) rather than (A). For that reason, even if cluster membership is associated with abuse-related findings, the cluster solution remains descriptive and does not by itself identify an abuse mechanism.</p>
+<p><span class="math display">\[
+C = g(X_1, \dots, X_p).
+\]</span></p>
+<p>Equivalently, each observed feature can be written as</p>
+<p><span class="math display">\[
+X_j = f_j(A, S, U_j), \quad j = 1, \dots, p,
+\]</span></p>
+<p>where <span class="math inline">\(U_j\)</span> represents other unmeasured causes of feature <span class="math inline">\(X_j\)</span>. Under this framework, the cluster assignment <span class="math inline">\(C\)</span> is not itself a causal variable and should not be interpreted as a direct measure of abuse. Instead, it is a constructed summary of the observed feature vector.</p>
+<p>If variables such as loss of consciousness, hypoxic–ischemic injury, or retinal hemorrhage are strongly influenced by severity of intracranial pathology, then the clustering may primarily reflect <span class="math inline">\(S\)</span> rather than <span class="math inline">\(A\)</span>. For that reason, even if cluster membership is associated with abuse-related findings, the cluster solution remains descriptive and does not by itself identify an abuse mechanism.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mermaid-diagram.png" class="img-fluid figure-img"></p>
+<figcaption>Figure: Causal DAG for Boos critique</figcaption>
+</figure>
+</div>
 </section>
 </section>
-<section id="next-steps" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Next Steps</h1>
+<section id="next-steps" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Next Steps</h1>
 <p>Use this section to compare the cluster profiles against Boos et al.</p>
 <p>Points to verify against the paper:</p>
 <ul>

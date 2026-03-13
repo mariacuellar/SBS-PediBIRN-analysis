@@ -363,7 +363,8 @@ The combined analytic dataset contained `r nrow(dat_raw)` eligible PediBIRN case
 
 Among candidate hierarchical clustering solutions from two through six clusters, the two-cluster solution had the highest average silhouette width (`r round(silhouette_tbl$average_silhouette_width[silhouette_tbl$k == 2], 3)`), although the magnitude of that value still suggested only modest separation. The resulting two-cluster solution was imbalanced in size and, after relabeling for interpretive consistency, cluster 1 corresponded to the higher-severity profile.
 
-```{r}
+```{r fig-cluster-sizes}
+#| fig-cap: "Cluster sizes for the two-cluster hierarchical solution."
 ggplot(cluster_size_tbl, aes(x = cluster_2, y = n, fill = cluster_2)) +
   geom_col(show.legend = FALSE) +
   labs(
@@ -376,7 +377,8 @@ ggplot(cluster_size_tbl, aes(x = cluster_2, y = n, fill = cluster_2)) +
 
 To understand what distinguished the two clusters, variables were ranked by their absolute between-cluster difference. The largest differences were observed for loss-of-consciousness severity, hypoxic-ischemic swelling, and circulatory compromise, indicating that the main separation was strongly linked to neurologic severity rather than to a narrowly trauma-specific pattern alone.
 
-```{r}
+```{r fig-driver-plot}
+#| fig-cap: "Variables most strongly separating the two hierarchical clusters."
 driver_plot_tbl <- driver_table |>
   mutate(variable = fct_reorder(variable, abs_difference))
 
@@ -397,7 +399,8 @@ ggplot(driver_plot_tbl, aes(x = abs_difference, y = variable, fill = difference 
 
 Loss-of-consciousness severity showed especially strong separation across the two-cluster solution. Cluster 1 was dominated by the most severe category, whereas cluster 2 was dominated by the absence of loss of consciousness.
 
-```{r}
+```{r fig-loc-by-cluster}
+#| fig-cap: "Loss-of-consciousness severity by hierarchical cluster."
 ggplot(table1_loc, aes(x = cluster_2, y = prop, fill = loc_severity)) +
   geom_col() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -414,7 +417,8 @@ ggplot(table1_loc, aes(x = cluster_2, y = prop, fill = loc_severity)) +
 
 The LCA was fit on complete cases only. Comparing two-, three-, and four-class solutions by information criteria indicated that the two-class model had the lowest BIC and therefore the best fit among the candidate models considered here.
 
-```{r}
+```{r fig-lca-bic}
+#| fig-cap: "BIC values for latent class models with two, three, and four classes."
 ggplot(lca_fit_tbl, aes(x = nclass, y = bic)) +
   geom_line() +
   geom_point(size = 2) +
@@ -429,7 +433,8 @@ ggplot(lca_fit_tbl, aes(x = nclass, y = bic)) +
 
 The best-fitting two-class LCA solution reproduced the same general pattern seen in the hierarchical clustering. To simplify comparison with the binary clinical features, loss of consciousness was collapsed into an indicator of any loss of consciousness versus none. Under that simplification, the highest-probability features in class 1 again reflected greater neurologic severity.
 
-```{r}
+```{r fig-lca-binary-prob}
+#| fig-cap: "Estimated binary feature probabilities in the best-fitting latent class model."
 ggplot(lca_binary_prob_tbl, aes(x = probability, y = fct_rev(variable), color = class)) +
   geom_point(size = 2.5, alpha = 0.9) +
   scale_color_manual(values = c("1" = "#1f78b4", "2" = "#e31a1c")) +
