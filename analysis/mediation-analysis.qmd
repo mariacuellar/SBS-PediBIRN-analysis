@@ -1,5 +1,5 @@
 ---
-title: "Boos 2025 Mediation Analysis Replication"
+title: "Mediation Analysis (Replication of Boos et al. 2025)"
 author: "Maria Cuellar"
 date: today
 resource-path:
