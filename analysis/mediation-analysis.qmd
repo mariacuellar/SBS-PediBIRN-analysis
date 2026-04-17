@@ -457,39 +457,39 @@ We now compare our subset-based estimates with the published coefficients shown 
 
 ```{r compare-with-boos}
 boos_effect_tbl <- tibble::tribble(
-  ~model, ~effect, ~boos_estimate,
-  "A", "indirect__diffuse_HIE", 0.834,
-  "A", "indirect__extra_axial_blood", 0.503,
-  "A", "direct", 2.431,
-  "A", "total", 3.768,
-  "B", "indirect__extra_axial_blood", 0.464,
-  "B", "indirect__clinical_hypoxia_ischemia", 0.448,
-  "B", "indirect__diffuse_HIE", 0.386,
-  "B", "indirect__seizure", 0.272,
-  "B", "direct", 1.701,
-  "B", "total", 3.271,
-  "C", "indirect__duration_altered_consciousness", 0.589,
-  "C", "indirect__extra_axial_blood", 0.273,
-  "C", "indirect__clinical_hypoxia_ischemia", 0.268,
-  "C", "indirect__seizure", 0.190,
-  "C", "direct", 0.936,
-  "C", "total", 2.256,
-  "D", "indirect__duration_altered_consciousness", 0.486,
-  "D", "indirect__clinical_hypoxia_ischemia", 0.295,
-  "D", "indirect__extra_axial_blood", 0.270,
-  "D", "indirect__seizure", 0.184,
-  "D", "direct", 0.889,
-  "D", "total", 2.124,
-  "E", "indirect__duration_altered_consciousness", 0.591,
-  "E", "indirect__diffuse_HIE", 0.437,
-  "E", "indirect__seizure", 0.200,
-  "E", "indirect__extra_axial_blood", 0.137,
-  "E", "direct", 0.604,
-  "E", "total", 1.969
+  ~model, ~effect, ~boos_estimate, ~boos_se,
+  "A", "indirect__diffuse_HIE", 0.834, 0.198,
+  "A", "indirect__extra_axial_blood", 0.503, 0.589,
+  "A", "direct", 2.431, 0.370,
+  "A", "total", 3.768, NA_real_,
+  "B", "indirect__extra_axial_blood", 0.464, 0.118,
+  "B", "indirect__clinical_hypoxia_ischemia", 0.448, 0.168,
+  "B", "indirect__diffuse_HIE", 0.386, 0.109,
+  "B", "indirect__seizure", 0.272, 0.094,
+  "B", "direct", 1.701, 0.308,
+  "B", "total", 3.271, NA_real_,
+  "C", "indirect__duration_altered_consciousness", 0.589, 0.269,
+  "C", "indirect__extra_axial_blood", 0.273, 0.099,
+  "C", "indirect__clinical_hypoxia_ischemia", 0.268, 0.197,
+  "C", "indirect__seizure", 0.190, 0.054,
+  "C", "direct", 0.936, 0.247,
+  "C", "total", 2.256, NA_real_,
+  "D", "indirect__duration_altered_consciousness", 0.486, 0.213,
+  "D", "indirect__clinical_hypoxia_ischemia", 0.295, 0.106,
+  "D", "indirect__extra_axial_blood", 0.270, 0.079,
+  "D", "indirect__seizure", 0.184, 0.059,
+  "D", "direct", 0.889, 0.209,
+  "D", "total", 2.124, NA_real_,
+  "E", "indirect__duration_altered_consciousness", 0.591, 0.201,
+  "E", "indirect__diffuse_HIE", 0.437, 0.108,
+  "E", "indirect__seizure", 0.200, 0.055,
+  "E", "indirect__extra_axial_blood", 0.137, 0.076,
+  "E", "direct", 0.604, 0.213,
+  "E", "total", 1.969, NA_real_
 ) |>
   left_join(
     effect_tbl_long |>
-      select(model, effect, subset_estimate = estimate),
+      select(model, effect, subset_estimate = estimate, subset_se = se, subset_ci_lower = ci_lower, subset_ci_upper = ci_upper),
     by = c("model", "effect")
   ) |>
   mutate(
@@ -516,22 +516,41 @@ We now visualize the direct and total effects from the published figures alongsi
 #| fig-cap: "Published Boos versus subset-based direct and total effects across Models A-E."
 boos_vs_subset_plot_tbl <- boos_effect_tbl |>
   filter(effect %in% c("Direct", "Total")) |>
-  select(model, effect, boos_estimate, subset_estimate) |>
+  transmute(
+    model,
+    effect,
+    `Boos et al.` = boos_estimate,
+    `Subset replication` = subset_estimate,
+    boos_se,
+    subset_ci_lower,
+    subset_ci_upper
+  ) |>
   pivot_longer(
-    cols = c(boos_estimate, subset_estimate),
+    cols = c(`Boos et al.`, `Subset replication`),
     names_to = "source",
     values_to = "estimate"
   ) |>
   mutate(
-    source = recode(
-      source,
-      boos_estimate = "Boos et al.",
-      subset_estimate = "Subset replication"
+    ci_lower = case_when(
+      source == "Boos et al." & !is.na(boos_se) ~ estimate - 1.96 * boos_se,
+      source == "Subset replication" ~ subset_ci_lower,
+      TRUE ~ NA_real_
+    ),
+    ci_upper = case_when(
+      source == "Boos et al." & !is.na(boos_se) ~ estimate + 1.96 * boos_se,
+      source == "Subset replication" ~ subset_ci_upper,
+      TRUE ~ NA_real_
     )
   )
 
 ggplot(boos_vs_subset_plot_tbl, aes(x = model, y = estimate, fill = source)) +
   geom_col(position = "dodge") +
+  geom_errorbar(
+    aes(ymin = ci_lower, ymax = ci_upper),
+    position = position_dodge(width = 0.9),
+    width = 0.2,
+    na.rm = TRUE
+  ) +
   facet_wrap(~ effect) +
   labs(
     title = "Direct and total effects: published versus subset-based estimates",
@@ -629,3 +648,7 @@ Within those limits, this file provides a transparent first-pass implementation 
 - Check the paper PDF directly against the inferred Model A structure and confirm whether the published Figure 1 corresponds to this simpler DAG-based specification.
 - Compare the estimates here against the abstract values for direct and indirect effects.
 - If needed, refine the inferred B-E specifications once the full figure definitions can be confirmed from the paper.
+
+# Model Structure
+
+Models A-E are best understood as alternative causal specifications built from largely the same set of clinical variables, rather than as five entirely different analyses. Across the five models, the outcome remains severe retinal injury, but variables such as isolated inertial injury, inertial injury, diffuse HIE, clinical hypoxia or ischemia, duration of altered consciousness, extra-axial blood, and seizure are reassigned to different roles as primary exposures or mediators. In that sense, the models are permutations of a shared variable set, but they are not merely arbitrary reorderings. Each model encodes a different hypothesized causal mechanism for how severe retinal injury might arise, and the purpose of comparing them is to see which arrangement of the same core variables provides the most explanatory account of the observed data.
