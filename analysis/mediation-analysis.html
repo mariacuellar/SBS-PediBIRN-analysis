@@ -165,6 +165,7 @@ window.Quarto = {
   <li><a href="#model-a-outcome-model-coefficients" id="toc-model-a-outcome-model-coefficients"><span class="header-section-number">4.3</span> Model A Outcome-Model Coefficients</a></li>
   <li><a href="#effect-plot" id="toc-effect-plot"><span class="header-section-number">4.4</span> Effect Plot</a></li>
   <li><a href="#recreated-figure-1" id="toc-recreated-figure-1"><span class="header-section-number">4.5</span> Recreated Figure 1</a></li>
+  <li><a href="#recreated-figures-2-5" id="toc-recreated-figures-2-5"><span class="header-section-number">4.6</span> Recreated Figures 2-5</a></li>
   </ul></li>
   <li><a href="#discussion" id="toc-discussion"><span class="header-section-number">5</span> Discussion</a></li>
   <li><a href="#next-steps" id="toc-next-steps"><span class="header-section-number">6</span> Next Steps</a></li>
@@ -612,7 +613,7 @@ window.Quarto = {
 <span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>n_boot <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>n_boot <span class="ot">&lt;-</span> <span class="dv">200</span></span>
 <span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>model_results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(model_specs)), <span class="cf">function</span>(i) {</span>
 <span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>  spec <span class="ot">&lt;-</span> model_specs[i, ]</span>
@@ -717,9 +718,9 @@ window.Quarto = {
 <td style="text-align: left;">isolated_inertial_injury</td>
 <td style="text-align: left;">Indirect via diffuse HIE</td>
 <td style="text-align: right;">0.467</td>
-<td style="text-align: right;">0.665</td>
-<td style="text-align: right;">-0.782</td>
-<td style="text-align: right;">1.883</td>
+<td style="text-align: right;">0.700</td>
+<td style="text-align: right;">-0.972</td>
+<td style="text-align: right;">1.849</td>
 <td style="text-align: right;">313</td>
 </tr>
 <tr class="even">
@@ -727,9 +728,9 @@ window.Quarto = {
 <td style="text-align: left;">isolated_inertial_injury</td>
 <td style="text-align: left;">Indirect via extra axial blood</td>
 <td style="text-align: right;">1.914</td>
-<td style="text-align: right;">4.465</td>
-<td style="text-align: right;">0.392</td>
-<td style="text-align: right;">8.301</td>
+<td style="text-align: right;">5.833</td>
+<td style="text-align: right;">0.341</td>
+<td style="text-align: right;">17.922</td>
 <td style="text-align: right;">313</td>
 </tr>
 <tr class="odd">
@@ -737,9 +738,9 @@ window.Quarto = {
 <td style="text-align: left;">isolated_inertial_injury</td>
 <td style="text-align: left;">Direct</td>
 <td style="text-align: right;">1.490</td>
-<td style="text-align: right;">0.302</td>
-<td style="text-align: right;">0.964</td>
-<td style="text-align: right;">2.123</td>
+<td style="text-align: right;">0.336</td>
+<td style="text-align: right;">0.955</td>
+<td style="text-align: right;">2.149</td>
 <td style="text-align: right;">313</td>
 </tr>
 <tr class="even">
@@ -747,9 +748,9 @@ window.Quarto = {
 <td style="text-align: left;">isolated_inertial_injury</td>
 <td style="text-align: left;">Total</td>
 <td style="text-align: right;">3.872</td>
-<td style="text-align: right;">4.453</td>
-<td style="text-align: right;">1.830</td>
-<td style="text-align: right;">10.268</td>
+<td style="text-align: right;">5.777</td>
+<td style="text-align: right;">1.625</td>
+<td style="text-align: right;">21.372</td>
 <td style="text-align: right;">313</td>
 </tr>
 <tr class="odd">
@@ -757,9 +758,9 @@ window.Quarto = {
 <td style="text-align: left;">inertial_injury</td>
 <td style="text-align: left;">Indirect via extra axial blood</td>
 <td style="text-align: right;">1.201</td>
-<td style="text-align: right;">1.060</td>
-<td style="text-align: right;">-0.355</td>
-<td style="text-align: right;">3.343</td>
+<td style="text-align: right;">2.304</td>
+<td style="text-align: right;">-0.742</td>
+<td style="text-align: right;">3.284</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -767,9 +768,9 @@ window.Quarto = {
 <td style="text-align: left;">inertial_injury</td>
 <td style="text-align: left;">Indirect via clinical hypoxia ischemia</td>
 <td style="text-align: right;">2.009</td>
-<td style="text-align: right;">1.031</td>
-<td style="text-align: right;">0.346</td>
-<td style="text-align: right;">4.285</td>
+<td style="text-align: right;">0.969</td>
+<td style="text-align: right;">0.744</td>
+<td style="text-align: right;">4.234</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -777,9 +778,9 @@ window.Quarto = {
 <td style="text-align: left;">inertial_injury</td>
 <td style="text-align: left;">Indirect via diffuse HIE</td>
 <td style="text-align: right;">5.046</td>
-<td style="text-align: right;">8.676</td>
-<td style="text-align: right;">2.763</td>
-<td style="text-align: right;">34.432</td>
+<td style="text-align: right;">9.129</td>
+<td style="text-align: right;">2.532</td>
+<td style="text-align: right;">34.426</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -787,9 +788,9 @@ window.Quarto = {
 <td style="text-align: left;">inertial_injury</td>
 <td style="text-align: left;">Indirect via seizure</td>
 <td style="text-align: right;">1.421</td>
-<td style="text-align: right;">1.352</td>
-<td style="text-align: right;">0.171</td>
-<td style="text-align: right;">3.425</td>
+<td style="text-align: right;">0.732</td>
+<td style="text-align: right;">0.148</td>
+<td style="text-align: right;">2.874</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -797,9 +798,9 @@ window.Quarto = {
 <td style="text-align: left;">inertial_injury</td>
 <td style="text-align: left;">Direct</td>
 <td style="text-align: right;">17.743</td>
-<td style="text-align: right;">0.358</td>
-<td style="text-align: right;">17.026</td>
-<td style="text-align: right;">18.432</td>
+<td style="text-align: right;">0.334</td>
+<td style="text-align: right;">17.120</td>
+<td style="text-align: right;">18.297</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -807,9 +808,9 @@ window.Quarto = {
 <td style="text-align: left;">inertial_injury</td>
 <td style="text-align: left;">Total</td>
 <td style="text-align: right;">27.420</td>
-<td style="text-align: right;">9.173</td>
-<td style="text-align: right;">24.226</td>
-<td style="text-align: right;">58.356</td>
+<td style="text-align: right;">9.362</td>
+<td style="text-align: right;">23.855</td>
+<td style="text-align: right;">57.403</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -817,9 +818,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via duration altered consciousness</td>
 <td style="text-align: right;">0.663</td>
-<td style="text-align: right;">0.299</td>
-<td style="text-align: right;">0.113</td>
-<td style="text-align: right;">1.333</td>
+<td style="text-align: right;">0.305</td>
+<td style="text-align: right;">0.149</td>
+<td style="text-align: right;">1.291</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -827,9 +828,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via extra axial blood</td>
 <td style="text-align: right;">0.656</td>
-<td style="text-align: right;">2.375</td>
-<td style="text-align: right;">-0.533</td>
-<td style="text-align: right;">3.906</td>
+<td style="text-align: right;">3.275</td>
+<td style="text-align: right;">-0.442</td>
+<td style="text-align: right;">3.396</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -837,9 +838,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via clinical hypoxia ischemia</td>
 <td style="text-align: right;">0.898</td>
-<td style="text-align: right;">1.084</td>
-<td style="text-align: right;">-1.220</td>
-<td style="text-align: right;">3.112</td>
+<td style="text-align: right;">1.088</td>
+<td style="text-align: right;">-1.114</td>
+<td style="text-align: right;">2.950</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -847,9 +848,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via seizure</td>
 <td style="text-align: right;">0.578</td>
-<td style="text-align: right;">0.312</td>
-<td style="text-align: right;">0.112</td>
-<td style="text-align: right;">1.304</td>
+<td style="text-align: right;">0.343</td>
+<td style="text-align: right;">0.095</td>
+<td style="text-align: right;">1.420</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -857,9 +858,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Direct</td>
 <td style="text-align: right;">1.520</td>
-<td style="text-align: right;">0.362</td>
-<td style="text-align: right;">0.867</td>
-<td style="text-align: right;">2.325</td>
+<td style="text-align: right;">0.376</td>
+<td style="text-align: right;">0.858</td>
+<td style="text-align: right;">2.295</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -867,9 +868,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Total</td>
 <td style="text-align: right;">4.315</td>
-<td style="text-align: right;">2.530</td>
-<td style="text-align: right;">2.196</td>
-<td style="text-align: right;">8.064</td>
+<td style="text-align: right;">3.387</td>
+<td style="text-align: right;">2.393</td>
+<td style="text-align: right;">7.603</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -877,9 +878,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via duration altered consciousness</td>
 <td style="text-align: right;">0.663</td>
-<td style="text-align: right;">0.290</td>
-<td style="text-align: right;">0.104</td>
-<td style="text-align: right;">1.227</td>
+<td style="text-align: right;">0.320</td>
+<td style="text-align: right;">0.078</td>
+<td style="text-align: right;">1.300</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -887,9 +888,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via clinical hypoxia ischemia</td>
 <td style="text-align: right;">0.898</td>
-<td style="text-align: right;">1.021</td>
-<td style="text-align: right;">-1.138</td>
-<td style="text-align: right;">2.825</td>
+<td style="text-align: right;">1.091</td>
+<td style="text-align: right;">-1.309</td>
+<td style="text-align: right;">2.870</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -897,9 +898,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via extra axial blood</td>
 <td style="text-align: right;">0.656</td>
-<td style="text-align: right;">1.787</td>
-<td style="text-align: right;">-0.449</td>
-<td style="text-align: right;">3.851</td>
+<td style="text-align: right;">1.026</td>
+<td style="text-align: right;">-0.578</td>
+<td style="text-align: right;">3.441</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -907,9 +908,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Indirect via seizure</td>
 <td style="text-align: right;">0.578</td>
-<td style="text-align: right;">0.302</td>
-<td style="text-align: right;">0.087</td>
-<td style="text-align: right;">1.262</td>
+<td style="text-align: right;">0.354</td>
+<td style="text-align: right;">0.138</td>
+<td style="text-align: right;">1.463</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -917,9 +918,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Direct</td>
 <td style="text-align: right;">1.520</td>
-<td style="text-align: right;">0.350</td>
-<td style="text-align: right;">0.902</td>
-<td style="text-align: right;">2.233</td>
+<td style="text-align: right;">0.388</td>
+<td style="text-align: right;">0.856</td>
+<td style="text-align: right;">2.264</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -927,9 +928,9 @@ window.Quarto = {
 <td style="text-align: left;">diffuse_HIE</td>
 <td style="text-align: left;">Total</td>
 <td style="text-align: right;">4.315</td>
-<td style="text-align: right;">2.026</td>
-<td style="text-align: right;">2.209</td>
-<td style="text-align: right;">8.087</td>
+<td style="text-align: right;">1.457</td>
+<td style="text-align: right;">1.952</td>
+<td style="text-align: right;">7.779</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -937,9 +938,9 @@ window.Quarto = {
 <td style="text-align: left;">clinical_hypoxia_ischemia</td>
 <td style="text-align: left;">Indirect via duration altered consciousness</td>
 <td style="text-align: right;">0.806</td>
-<td style="text-align: right;">0.339</td>
-<td style="text-align: right;">0.156</td>
-<td style="text-align: right;">1.552</td>
+<td style="text-align: right;">0.366</td>
+<td style="text-align: right;">0.081</td>
+<td style="text-align: right;">1.579</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -947,9 +948,9 @@ window.Quarto = {
 <td style="text-align: left;">clinical_hypoxia_ischemia</td>
 <td style="text-align: left;">Indirect via diffuse HIE</td>
 <td style="text-align: right;">3.586</td>
-<td style="text-align: right;">0.961</td>
-<td style="text-align: right;">2.033</td>
-<td style="text-align: right;">5.772</td>
+<td style="text-align: right;">1.022</td>
+<td style="text-align: right;">2.068</td>
+<td style="text-align: right;">6.150</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -957,9 +958,9 @@ window.Quarto = {
 <td style="text-align: left;">clinical_hypoxia_ischemia</td>
 <td style="text-align: left;">Indirect via seizure</td>
 <td style="text-align: right;">1.077</td>
-<td style="text-align: right;">0.449</td>
-<td style="text-align: right;">0.340</td>
-<td style="text-align: right;">1.974</td>
+<td style="text-align: right;">0.517</td>
+<td style="text-align: right;">0.158</td>
+<td style="text-align: right;">2.173</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -967,9 +968,9 @@ window.Quarto = {
 <td style="text-align: left;">clinical_hypoxia_ischemia</td>
 <td style="text-align: left;">Indirect via extra axial blood</td>
 <td style="text-align: right;">-0.459</td>
-<td style="text-align: right;">0.814</td>
-<td style="text-align: right;">-2.066</td>
-<td style="text-align: right;">1.068</td>
+<td style="text-align: right;">0.855</td>
+<td style="text-align: right;">-2.078</td>
+<td style="text-align: right;">1.056</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="odd">
@@ -977,9 +978,9 @@ window.Quarto = {
 <td style="text-align: left;">clinical_hypoxia_ischemia</td>
 <td style="text-align: left;">Direct</td>
 <td style="text-align: right;">0.381</td>
-<td style="text-align: right;">0.430</td>
-<td style="text-align: right;">-0.488</td>
-<td style="text-align: right;">1.198</td>
+<td style="text-align: right;">0.447</td>
+<td style="text-align: right;">-0.421</td>
+<td style="text-align: right;">1.152</td>
 <td style="text-align: right;">312</td>
 </tr>
 <tr class="even">
@@ -987,9 +988,9 @@ window.Quarto = {
 <td style="text-align: left;">clinical_hypoxia_ischemia</td>
 <td style="text-align: left;">Total</td>
 <td style="text-align: right;">5.390</td>
-<td style="text-align: right;">1.356</td>
-<td style="text-align: right;">3.140</td>
-<td style="text-align: right;">8.269</td>
+<td style="text-align: right;">1.395</td>
+<td style="text-align: right;">3.098</td>
+<td style="text-align: right;">8.359</td>
 <td style="text-align: right;">312</td>
 </tr>
 </tbody>
@@ -1341,6 +1342,47 @@ window.Quarto = {
 </div>
 </div>
 <p>Table 4 is meant to show whether the subset-based replication lands in the same general range as the published figures, even though the subset is smaller and some variable definitions remain reconstructed rather than verified from the full study codebook.</p>
+<p>We now visualize the direct and total effects from the published figures alongside the subset-based estimates so the overall agreement can be judged more quickly than from the table alone.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>boos_vs_subset_plot_tbl <span class="ot">&lt;-</span> boos_effect_tbl <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(effect <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Direct"</span>, <span class="st">"Total"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(model, effect, boos_estimate, subset_estimate) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(boos_estimate, subset_estimate),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"source"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"estimate"</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">source =</span> <span class="fu">recode</span>(</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>      source,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">boos_estimate =</span> <span class="st">"Boos et al."</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">subset_estimate =</span> <span class="st">"Subset replication"</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(boos_vs_subset_plot_tbl, <span class="fu">aes</span>(<span class="at">x =</span> model, <span class="at">y =</span> estimate, <span class="at">fill =</span> source)) <span class="sc">+</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> effect) <span class="sc">+</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Direct and total effects: published versus subset-based estimates"</span>,</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Model"</span>,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Effect estimate (log-odds)"</span>,</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="cn">NULL</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mediation-analysis_files/figure-html/boos-vs-subset-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Published Boos versus subset-based direct and total effects across Models A-E.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>This figure helps show whether the subset-based replication preserves the broad ranking and scale of the published direct and total effects, even when the exact values differ.</p>
 </section>
 <section id="model-a-outcome-model-coefficients" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="model-a-outcome-model-coefficients"><span class="header-section-number">4.3</span> Model A Outcome-Model Coefficients</h2>
@@ -1348,16 +1390,16 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>outcome_coef_tbl <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">coef</span>(<span class="fu">summary</span>(outcome_model))) <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">rownames_to_column</span>(<span class="st">"term"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate =</span> Estimate,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">std_error =</span> <span class="st">`</span><span class="at">Std. Error</span><span class="st">`</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">statistic =</span> <span class="st">`</span><span class="at">z value</span><span class="st">`</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_value =</span> <span class="st">`</span><span class="at">Pr(&gt;|z|)</span><span class="st">`</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(outcome_coef_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 5. Model A outcome-model coefficients"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>outcome_coef_tbl <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">coef</span>(<span class="fu">summary</span>(outcome_model))) <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">rownames_to_column</span>(<span class="st">"term"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate =</span> Estimate,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">std_error =</span> <span class="st">`</span><span class="at">Std. Error</span><span class="st">`</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">statistic =</span> <span class="st">`</span><span class="at">z value</span><span class="st">`</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_value =</span> <span class="st">`</span><span class="at">Pr(&gt;|z|)</span><span class="st">`</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(outcome_coef_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 5. Model A outcome-model coefficients"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1412,33 +1454,33 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>effect_tbl_model_a <span class="ot">&lt;-</span> effect_tbl_long <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(model <span class="sc">==</span> <span class="st">"A"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_lower =</span> <span class="fu">apply</span>(model_results[[<span class="st">"A"</span>]]<span class="sc">$</span>boot[, effect, <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.025</span>),</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_upper =</span> <span class="fu">apply</span>(model_results[[<span class="st">"A"</span>]]<span class="sc">$</span>boot[, effect, <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.975</span>)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(effect, estimate, ci_lower, ci_upper) <span class="sc">|&gt;</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">effect =</span> <span class="fu">recode</span>(</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>      effect,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">"indirect__diffuse_HIE"</span> <span class="ot">=</span> <span class="st">"Indirect via diffuse_HIE"</span>,</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"indirect__extra_axial_blood"</span> <span class="ot">=</span> <span class="st">"Indirect via extra_axial_blood"</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">direct =</span> <span class="st">"Direct"</span>,</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">total =</span> <span class="st">"Total"</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(effect_tbl_model_a, <span class="fu">aes</span>(<span class="at">x =</span> effect, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#3C6E71"</span>) <span class="sc">+</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> ci_lower, <span class="at">ymax =</span> ci_upper), <span class="at">width =</span> <span class="fl">0.15</span>) <span class="sc">+</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Direct and indirect effects"</span>,</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Effect estimate (log-odds)"</span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>effect_tbl_model_a <span class="ot">&lt;-</span> effect_tbl_long <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(model <span class="sc">==</span> <span class="st">"A"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_lower =</span> <span class="fu">apply</span>(model_results[[<span class="st">"A"</span>]]<span class="sc">$</span>boot[, effect, <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.025</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_upper =</span> <span class="fu">apply</span>(model_results[[<span class="st">"A"</span>]]<span class="sc">$</span>boot[, effect, <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.975</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(effect, estimate, ci_lower, ci_upper) <span class="sc">|&gt;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">effect =</span> <span class="fu">recode</span>(</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>      effect,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">"indirect__diffuse_HIE"</span> <span class="ot">=</span> <span class="st">"Indirect via diffuse_HIE"</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"indirect__extra_axial_blood"</span> <span class="ot">=</span> <span class="st">"Indirect via extra_axial_blood"</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">direct =</span> <span class="st">"Direct"</span>,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">total =</span> <span class="st">"Total"</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(effect_tbl_model_a, <span class="fu">aes</span>(<span class="at">x =</span> effect, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#3C6E71"</span>) <span class="sc">+</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> ci_lower, <span class="at">ymax =</span> ci_upper), <span class="at">width =</span> <span class="fl">0.15</span>) <span class="sc">+</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Direct and indirect effects"</span>,</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Effect estimate (log-odds)"</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -1458,6 +1500,34 @@ window.Quarto = {
 <figure class="figure">
 <p><img src="figures-mediation-analysis/boos2025-figure1-modelA-replication.svg" class="img-fluid figure-img"></p>
 <figcaption>Recreated Figure 1 using subset-based Model A estimates.</figcaption>
+</figure>
+</div>
+</section>
+<section id="recreated-figures-2-5" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="recreated-figures-2-5"><span class="header-section-number">4.6</span> Recreated Figures 2-5</h2>
+<p>We now show parallel diagram recreations for Models B-E using the same visual style as the Model A replication figure. These panels make it easier to compare the structure and relative path magnitudes across the five published mediation models.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures-mediation-analysis/boos2025-figure2-modelB-replication.svg" class="img-fluid figure-img"></p>
+<figcaption>Recreated Figure 2 using subset-based Model B estimates.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures-mediation-analysis/boos2025-figure3-modelC-replication.svg" class="img-fluid figure-img"></p>
+<figcaption>Recreated Figure 3 using subset-based Model C estimates.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures-mediation-analysis/boos2025-figure4-modelD-replication.svg" class="img-fluid figure-img"></p>
+<figcaption>Recreated Figure 4 using subset-based Model D estimates.</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures-mediation-analysis/boos2025-figure5-modelE-replication.svg" class="img-fluid figure-img"></p>
+<figcaption>Recreated Figure 5 using subset-based Model E estimates.</figcaption>
 </figure>
 </div>
 </section>
