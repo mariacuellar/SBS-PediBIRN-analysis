@@ -9,7 +9,10 @@ groupings or instead severity of intracranial injury.
 
 ## Main documents
 
-- [Analysis](https://mariacuellar.github.io/SBS-PediBIRN-analysis/analysis/clustering-analysis.html)
+- [Clustering
+  Analysis](https://mariacuellar.github.io/SBS-PediBIRN-analysis/analysis/clustering-analysis.html)
+- [Mediation
+  Analysis](https://mariacuellar.github.io/SBS-PediBIRN-analysis/analysis/mediation-analysis.html)
 - [Paper PDF](paper/paper.pdf)
 
 ## Repository structure
