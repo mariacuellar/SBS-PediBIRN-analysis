@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="900" viewBox="0 0 1800 900">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a7a7a"/>
+    </marker>
+    <style>
+      .box { fill: #f3f3f3; stroke: #b8b8b8; stroke-width: 2; rx: 10; ry: 10; }
+      .label { font-family: Helvetica, Arial, sans-serif; font-size: 24px; fill: #111; text-anchor: middle; dominant-baseline: middle; }
+      .small { font-size: 22px; }
+      .edge { stroke: #7a7a7a; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .title { font-family: Helvetica, Arial, sans-serif; font-size: 28px; fill: #111; font-weight: 600; }
+    </style>
+  </defs>
+
+  <text x="120" y="70" class="title">First mediation model DAG</text>
+
+  <!-- Covariates -->
+  <rect class="box" x="120" y="120" width="300" height="110"/>
+  <text class="label" x="270" y="175">Age in months</text>
+
+  <rect class="box" x="120" y="300" width="300" height="110"/>
+  <text class="label" x="270" y="355">Respiratory compromise</text>
+
+  <!-- Exposure -->
+  <rect class="box" x="520" y="210" width="380" height="120"/>
+  <text class="label" x="710" y="270">Isolated inertial injury</text>
+
+  <!-- Mediators -->
+  <rect class="box" x="1010" y="120" width="300" height="110"/>
+  <text class="label" x="1160" y="175">Diffuse HIE</text>
+
+  <rect class="box" x="1010" y="300" width="300" height="110"/>
+  <text class="label small" x="1160" y="355">Extra-axial blood</text>
+
+  <!-- Outcome -->
+  <rect class="box" x="1420" y="210" width="320" height="120"/>
+  <text class="label small" x="1580" y="270">Severe retinal injury</text>
+
+  <!-- Edges from exposure -->
+  <path class="edge" d="M 900 245 C 950 220, 960 195, 1010 175"/>
+  <path class="edge" d="M 900 295 C 950 320, 960 335, 1010 355"/>
+  <path class="edge" d="M 900 270 C 1080 270, 1240 270, 1420 270"/>
+
+  <!-- Edges from mediators to outcome -->
+  <path class="edge" d="M 1310 175 C 1360 190, 1380 220, 1420 250"/>
+  <path class="edge" d="M 1310 355 C 1360 340, 1380 320, 1420 290"/>
+
+  <!-- Edges from age -->
+  <path class="edge" d="M 420 160 C 620 140, 800 145, 1010 165"/>
+  <path class="edge" d="M 420 175 C 620 190, 790 245, 1010 345"/>
+  <path class="edge" d="M 420 190 C 760 130, 1120 120, 1420 245"/>
+
+  <!-- Edges from respiratory compromise -->
+  <path class="edge" d="M 420 340 C 640 280, 810 210, 1010 185"/>
+  <path class="edge" d="M 420 355 C 660 355, 820 355, 1010 355"/>
+  <path class="edge" d="M 420 370 C 760 430, 1120 430, 1420 295"/>
+</svg>
