@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1400" viewBox="0 0 2200 1400">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a7a7a"/>
+    </marker>
+    <style>
+      .title { font-family: Helvetica, Arial, sans-serif; font-size: 40px; font-weight: 700; fill: #111; text-anchor: middle; }
+      .subtitle { font-family: Helvetica, Arial, sans-serif; font-size: 24px; fill: #333; text-anchor: middle; }
+      .box { fill: #f3f3f3; stroke: #b8b8b8; stroke-width: 3; rx: 10; ry: 10; }
+      .label { font-family: Helvetica, Arial, sans-serif; font-size: 28px; fill: #111; text-anchor: middle; dominant-baseline: middle; }
+      .edge { stroke: #7a7a7a; stroke-width: 3.5; fill: none; marker-end: url(#arrow); }
+      .edge-bold { stroke: #7a7a7a; stroke-width: 4.5; fill: none; marker-end: url(#arrow); }
+      .effect { font-family: Helvetica, Arial, sans-serif; font-size: 24px; fill: #222; }
+      .note { font-family: Helvetica, Arial, sans-serif; font-size: 22px; fill: #444; text-anchor: middle; }
+    </style>
+  </defs>
+  <text x="1100" y="70" class="title">Figure 5. Model E Mediation Replication</text>
+  <text x="1100" y="115" class="subtitle">Boos 2025 structure recreated with PediBIRN subset estimates</text>
+  <text x="1100" y="155" class="subtitle">Total effect β = 5.390 | n = 312 complete cases</text>
+
+  <rect class="box" x="70" y="520" width="460" height="180"/>
+  <text class="label" x="300.0" y="586.0">Clinical hypoxia</text>
+  <text class="label" x="300.0" y="634.0">or ischemia</text>
+  <rect class="box" x="1760" y="520" width="360" height="180"/>
+  <text class="label" x="1940.0" y="586.0">Severe retinal</text>
+  <text class="label" x="1940.0" y="634.0">injury</text>
+  <rect class="box" x="760" y="110" width="520" height="130"/>
+  <text class="label" x="1020.0" y="151.0">Duration of altered</text>
+  <text class="label" x="1020.0" y="199.0">consciousness</text>
+  <text x="670" y="185" class="effect">β = 0.806</text>
+  <rect class="box" x="760" y="330" width="520" height="130"/>
+  <text class="label" x="1020.0" y="395.0">Diffuse HIE</text>
+  <text x="670" y="405" class="effect">β = 3.586</text>
+  <rect class="box" x="760" y="550" width="520" height="130"/>
+  <text class="label" x="1020.0" y="615.0">Seizure</text>
+  <text x="670" y="625" class="effect">β = 1.077</text>
+  <rect class="box" x="760" y="770" width="520" height="130"/>
+  <text class="label" x="1020.0" y="835.0">Extra-axial blood</text>
+  <text x="670" y="845" class="effect">β = -0.459</text>
+  <path class="edge" d="M 530 555 C 660 180, 690 175, 760 175"/>
+  <path class="edge" d="M 530 585 C 670 360, 690 395, 760 395"/>
+  <path class="edge" d="M 530 615 C 660 600, 690 615, 760 615"/>
+  <path class="edge" d="M 530 645 C 670 860, 690 835, 760 835"/>
+  <path class="edge" d="M 1280 175 C 1510 210, 1630 430, 1760 555"/>
+  <path class="edge" d="M 1280 395 C 1510 405, 1630 470, 1760 585"/>
+  <path class="edge" d="M 1280 615 C 1510 615, 1630 595, 1760 615"/>
+  <path class="edge" d="M 1280 835 C 1510 810, 1630 740, 1760 645"/>
+  <path class="edge-bold" d="M 530 610 C 1120 610, 1300 610, 1760 610"/>
+  <text x="1080" y="500" class="effect">Direct effect β = 0.381</text>
+  <text x="1100" y="1290" class="note">Effects shown are subset-based replication estimates on the log-odds scale.</text>
+  <text x="1100" y="1330" class="note">Model E published structure: exposure = clinical hypoxia or ischemia; mediators = duration of altered consciousness, diffuse HIE, seizure, extra-axial blood.</text>
+</svg>

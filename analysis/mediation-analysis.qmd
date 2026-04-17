@@ -348,7 +348,7 @@ fit_effects <- function(df, exposure, mediators) {
 }
 
 set.seed(123)
-n_boot <- 1000
+n_boot <- 200
 
 model_results <- lapply(seq_len(nrow(model_specs)), function(i) {
   spec <- model_specs[i, ]
@@ -510,6 +510,40 @@ kable(
 
 Table 4 is meant to show whether the subset-based replication lands in the same general range as the published figures, even though the subset is smaller and some variable definitions remain reconstructed rather than verified from the full study codebook.
 
+We now visualize the direct and total effects from the published figures alongside the subset-based estimates so the overall agreement can be judged more quickly than from the table alone.
+
+```{r boos-vs-subset-plot}
+#| fig-cap: "Published Boos versus subset-based direct and total effects across Models A-E."
+boos_vs_subset_plot_tbl <- boos_effect_tbl |>
+  filter(effect %in% c("Direct", "Total")) |>
+  select(model, effect, boos_estimate, subset_estimate) |>
+  pivot_longer(
+    cols = c(boos_estimate, subset_estimate),
+    names_to = "source",
+    values_to = "estimate"
+  ) |>
+  mutate(
+    source = recode(
+      source,
+      boos_estimate = "Boos et al.",
+      subset_estimate = "Subset replication"
+    )
+  )
+
+ggplot(boos_vs_subset_plot_tbl, aes(x = model, y = estimate, fill = source)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ effect) +
+  labs(
+    title = "Direct and total effects: published versus subset-based estimates",
+    x = "Model",
+    y = "Effect estimate (log-odds)",
+    fill = NULL
+  ) +
+  theme_minimal()
+```
+
+This figure helps show whether the subset-based replication preserves the broad ranking and scale of the published direct and total effects, even when the exact values differ.
+
 ## Model A Outcome-Model Coefficients
 
 We now display the fitted Model A outcome coefficients so it is clear which variables are driving the direct and mediated paths in the closest paper-match specification.
@@ -571,6 +605,18 @@ This figure helps show whether Model A is being driven mainly by the direct path
 We now recreate the first Boos 2025 mediation figure using the subset-based Model A estimates from this replication.
 
 ![Recreated Figure 1 using subset-based Model A estimates.](figures-mediation-analysis/boos2025-figure1-modelA-replication.svg)
+
+## Recreated Figures 2-5
+
+We now show parallel diagram recreations for Models B-E using the same visual style as the Model A replication figure. These panels make it easier to compare the structure and relative path magnitudes across the five published mediation models.
+
+![Recreated Figure 2 using subset-based Model B estimates.](figures-mediation-analysis/boos2025-figure2-modelB-replication.svg)
+
+![Recreated Figure 3 using subset-based Model C estimates.](figures-mediation-analysis/boos2025-figure3-modelC-replication.svg)
+
+![Recreated Figure 4 using subset-based Model D estimates.](figures-mediation-analysis/boos2025-figure4-modelD-replication.svg)
+
+![Recreated Figure 5 using subset-based Model E estimates.](figures-mediation-analysis/boos2025-figure5-modelE-replication.svg)
 
 # Discussion
 
