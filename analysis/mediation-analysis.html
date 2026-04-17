@@ -161,6 +161,7 @@ window.Quarto = {
   <ul>
   <li><a href="#outcome-model-coefficients" id="toc-outcome-model-coefficients"><span class="header-section-number">4.1</span> Outcome Model Coefficients</a></li>
   <li><a href="#effect-plot" id="toc-effect-plot"><span class="header-section-number">4.2</span> Effect Plot</a></li>
+  <li><a href="#recreated-figure-1" id="toc-recreated-figure-1"><span class="header-section-number">4.3</span> Recreated Figure 1</a></li>
   </ul></li>
   <li><a href="#discussion" id="toc-discussion"><span class="header-section-number">5</span> Discussion</a></li>
   <li><a href="#next-steps" id="toc-next-steps"><span class="header-section-number">6</span> Next Steps</a></li>
@@ -185,7 +186,7 @@ window.Quarto = {
 <li>The analysis is restricted to children with a documented ophthalmology evaluation.</li>
 <li>The outcome is reconstructed as <code>severe_retinal_injury = 1</code> if retinoschisis or severe retinal hemorrhage is present.</li>
 <li>The first mediation model is inferred to use <code>isolated_inertial_injury</code> as the primary exposure, with <code>diffuse_HIE</code> and <code>extra_axial_blood</code> as mediators, based on the paper abstract and the intern reconstruction document.</li>
-<li><code>age_months</code> and <code>respiratory_compromise</code> are included here as covariates. The accessible text indicates that both variables were considered in the broader multivariable analysis, but we could not verify from the available materials whether both appeared in the first mediation model specifically.</li>
+<li>Model A is now fit as a simple DAG-based mediation model without additional covariates, because the published figure structure appears to focus on the exposure, the two mediators, and the outcome alone.</li>
 </ul>
 <p>The goal is therefore not an identical reproduction of the published coefficients, but a transparent subset-based replication of the same basic causal model.</p>
 </section>
@@ -324,21 +325,19 @@ window.Quarto = {
 <span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>  <span class="st">"severe_retinal_injury"</span>,</span>
 <span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>  <span class="st">"isolated_inertial_injury"</span>,</span>
 <span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>  <span class="st">"diffuse_HIE"</span>,</span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>  <span class="st">"extra_axial_blood"</span>,</span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>  <span class="st">"age_months"</span>,</span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>  <span class="st">"respiratory_compromise"</span></span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>oph_subset <span class="ot">&lt;-</span> mediation_data <span class="sc">|&gt;</span></span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ophthalmology_eval <span class="sc">==</span> <span class="dv">1</span>L)</span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>summary_tbl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable =</span> analysis_vars,</span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_non_missing =</span> <span class="fu">sapply</span>(oph_subset[analysis_vars], <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(x))),</span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">sapply</span>(oph_subset[analysis_vars], <span class="cf">function</span>(x) <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 1. Reconstructed mediation-model variables in the ophthalmology subset"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>  <span class="st">"extra_axial_blood"</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>oph_subset <span class="ot">&lt;-</span> mediation_data <span class="sc">|&gt;</span></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ophthalmology_eval <span class="sc">==</span> <span class="dv">1</span>L)</span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>summary_tbl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable =</span> analysis_vars,</span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_non_missing =</span> <span class="fu">sapply</span>(oph_subset[analysis_vars], <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(x))),</span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">sapply</span>(oph_subset[analysis_vars], <span class="cf">function</span>(x) <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_tbl, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Table 1. Reconstructed mediation-model variables in the ophthalmology subset"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -371,16 +370,6 @@ window.Quarto = {
 <td style="text-align: right;">313</td>
 <td style="text-align: right;">0.907</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">age_months</td>
-<td style="text-align: right;">313</td>
-<td style="text-align: right;">7.214</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">respiratory_compromise</td>
-<td style="text-align: right;">312</td>
-<td style="text-align: right;">0.503</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -393,15 +382,15 @@ window.Quarto = {
 <section id="first-mediation-model" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="first-mediation-model"><span class="header-section-number">3.1</span> First Mediation Model</h2>
 <p>We now fit the inferred first mediation model, using isolated inertial injury as the exposure, diffuse HIE and extra-axial blood as mediators, and severe retinal injury as the outcome.</p>
-<p>Statistically, this is implemented here as three logistic regression models. Let (X_i) denote isolated inertial injury for child (i), let (M_{1i}) denote diffuse HIE, let (M_{2i}) denote extra-axial blood, let (Y_i) denote severe retinal injury, let (A_i) denote age in months, and let (R_i) denote respiratory compromise. The fitted models are:</p>
+<p>Statistically, this is implemented here as three logistic regression models. Let (X_i) denote isolated inertial injury for child (i), let (M_{1i}) denote diffuse HIE, let (M_{2i}) denote extra-axial blood, and let (Y_i) denote severe retinal injury. The fitted models are:</p>
 <p><span class="math display">\[
-\text{logit}\{\Pr(M_{1i} = 1)\} = \alpha_0 + \alpha_1 X_i + \alpha_2 A_i + \alpha_3 R_i + \varepsilon_{1i}
+\text{logit}\{\Pr(M_{1i} = 1)\} = \alpha_0 + \alpha_1 X_i + \varepsilon_{1i}
 \]</span></p>
 <p><span class="math display">\[
-\text{logit}\{\Pr(M_{2i} = 1)\} = \gamma_0 + \gamma_1 X_i + \gamma_2 A_i + \gamma_3 R_i + \varepsilon_{2i}
+\text{logit}\{\Pr(M_{2i} = 1)\} = \gamma_0 + \gamma_1 X_i + \varepsilon_{2i}
 \]</span></p>
 <p><span class="math display">\[
-\text{logit}\{\Pr(Y_i = 1)\} = \beta_0 + \beta_1 X_i + \beta_2 M_{1i} + \beta_3 M_{2i} + \beta_4 A_i + \beta_5 R_i + \varepsilon_{3i}
+\text{logit}\{\Pr(Y_i = 1)\} = \beta_0 + \beta_1 X_i + \beta_2 M_{1i} + \beta_3 M_{2i} + \varepsilon_{3i}
 \]</span></p>
 <p>Under this approximation, the direct effect is represented by (_1), while the two indirect effects are summarized by the coefficient products (_1 _2) and (_1 _3).</p>
 <p>We now show the same model as a directed acyclic graph.</p>
@@ -419,19 +408,19 @@ window.Quarto = {
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>mediator_model_diffuse_hie <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  diffuse_HIE <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> age_months <span class="sc">+</span> respiratory_compromise,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  diffuse_HIE <span class="sc">~</span> isolated_inertial_injury,</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_data,</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>mediator_model_extra_axial <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  extra_axial_blood <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> age_months <span class="sc">+</span> respiratory_compromise,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  extra_axial_blood <span class="sc">~</span> isolated_inertial_injury,</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_data,</span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>outcome_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  severe_retinal_injury <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> diffuse_HIE <span class="sc">+</span> extra_axial_blood <span class="sc">+</span> age_months <span class="sc">+</span> respiratory_compromise,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  severe_retinal_injury <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> diffuse_HIE <span class="sc">+</span> extra_axial_blood,</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_data,</span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -447,19 +436,19 @@ window.Quarto = {
 <summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fit_effects <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    diffuse_HIE <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> age_months <span class="sc">+</span> respiratory_compromise,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    diffuse_HIE <span class="sc">~</span> isolated_inertial_injury,</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> df,</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="fu">binomial</span>()</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  m2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    extra_axial_blood <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> age_months <span class="sc">+</span> respiratory_compromise,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    extra_axial_blood <span class="sc">~</span> isolated_inertial_injury,</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> df,</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="fu">binomial</span>()</span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    severe_retinal_injury <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> diffuse_HIE <span class="sc">+</span> extra_axial_blood <span class="sc">+</span> age_months <span class="sc">+</span> respiratory_compromise,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    severe_retinal_injury <span class="sc">~</span> isolated_inertial_injury <span class="sc">+</span> diffuse_HIE <span class="sc">+</span> extra_axial_blood,</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> df,</span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="fu">binomial</span>()</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  )</span>
@@ -514,7 +503,7 @@ window.Quarto = {
 <colgroup>
 <col style="width: 52%">
 <col style="width: 10%">
-<col style="width: 7%">
+<col style="width: 6%">
 <col style="width: 10%">
 <col style="width: 10%">
 <col style="width: 9%">
@@ -532,26 +521,26 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">indirect_diffuse_HIE.isolated_inertial_injury</td>
-<td style="text-align: right;">-0.020</td>
-<td style="text-align: right;">0.658</td>
-<td style="text-align: right;">-1.359</td>
-<td style="text-align: right;">1.297</td>
-<td style="text-align: right;">0.968</td>
+<td style="text-align: right;">0.467</td>
+<td style="text-align: right;">0.665</td>
+<td style="text-align: right;">-0.782</td>
+<td style="text-align: right;">1.883</td>
+<td style="text-align: right;">0.468</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">indirect_extra_axial.isolated_inertial_injury</td>
-<td style="text-align: right;">1.991</td>
-<td style="text-align: right;">13.932</td>
-<td style="text-align: right;">0.316</td>
-<td style="text-align: right;">7.991</td>
-<td style="text-align: right;">0.018</td>
+<td style="text-align: right;">1.914</td>
+<td style="text-align: right;">4.465</td>
+<td style="text-align: right;">0.392</td>
+<td style="text-align: right;">8.301</td>
+<td style="text-align: right;">0.004</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">direct.isolated_inertial_injury</td>
-<td style="text-align: right;">1.357</td>
-<td style="text-align: right;">0.316</td>
-<td style="text-align: right;">0.816</td>
-<td style="text-align: right;">2.051</td>
+<td style="text-align: right;">1.490</td>
+<td style="text-align: right;">0.302</td>
+<td style="text-align: right;">0.964</td>
+<td style="text-align: right;">2.123</td>
 <td style="text-align: right;">0.000</td>
 </tr>
 </tbody>
@@ -595,45 +584,31 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-3.470</td>
-<td style="text-align: right;">0.713</td>
-<td style="text-align: right;">-4.866</td>
-<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">-3.151</td>
+<td style="text-align: right;">0.673</td>
+<td style="text-align: right;">-4.679</td>
+<td style="text-align: right;">0.00</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">isolated_inertial_injury</td>
-<td style="text-align: right;">1.357</td>
-<td style="text-align: right;">0.316</td>
-<td style="text-align: right;">4.295</td>
-<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1.490</td>
+<td style="text-align: right;">0.298</td>
+<td style="text-align: right;">4.999</td>
+<td style="text-align: right;">0.00</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">diffuse_HIE</td>
-<td style="text-align: right;">2.013</td>
-<td style="text-align: right;">0.343</td>
-<td style="text-align: right;">5.864</td>
-<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">2.485</td>
+<td style="text-align: right;">0.306</td>
+<td style="text-align: right;">8.109</td>
+<td style="text-align: right;">0.00</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">extra_axial_blood</td>
-<td style="text-align: right;">1.699</td>
-<td style="text-align: right;">0.656</td>
-<td style="text-align: right;">2.591</td>
-<td style="text-align: right;">0.010</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">age_months</td>
-<td style="text-align: right;">-0.057</td>
-<td style="text-align: right;">0.021</td>
-<td style="text-align: right;">-2.673</td>
-<td style="text-align: right;">0.008</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">respiratory_compromise</td>
-<td style="text-align: right;">1.462</td>
-<td style="text-align: right;">0.323</td>
-<td style="text-align: right;">4.530</td>
-<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1.509</td>
+<td style="text-align: right;">0.647</td>
+<td style="text-align: right;">2.331</td>
+<td style="text-align: right;">0.02</td>
 </tr>
 </tbody>
 </table>
@@ -669,6 +644,16 @@ window.Quarto = {
 </div>
 <p>This figure helps show whether the first-model replication is being driven mainly by the direct path from isolated inertial injury to severe retinal injury, or by the indirect paths through diffuse HIE and extra-axial blood.</p>
 </section>
+<section id="recreated-figure-1" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="recreated-figure-1"><span class="header-section-number">4.3</span> Recreated Figure 1</h2>
+<p>We now recreate the first Boos 2025 mediation figure using the subset-based Model A estimates from this replication.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures-mediation-analysis/boos2025-figure1-modelA-replication.svg" class="img-fluid figure-img"></p>
+<figcaption>Recreated Figure 1 using subset-based Model A estimates.</figcaption>
+</figure>
+</div>
+</section>
 </section>
 <section id="discussion" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Discussion</h1>
@@ -678,9 +663,9 @@ window.Quarto = {
 <section id="next-steps" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Next Steps</h1>
 <ul>
-<li>Check the paper PDF directly against the inferred first-model structure and confirm whether age and respiratory compromise were included as covariates.</li>
+<li>Check the paper PDF directly against the inferred first-model structure and confirm whether the published Figure 1 corresponds to this simpler DAG-based specification.</li>
 <li>Compare the estimates here against the abstract values for direct and indirect effects.</li>
-<li>If needed, fit an alternative version of the first model without covariates, or with a different HIE mapping, and compare the results.</li>
+<li>If needed, fit alternative HIE mappings or alternative exposure definitions and compare the results.</li>
 </ul>
 </section>
 
