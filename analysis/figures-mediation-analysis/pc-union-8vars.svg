@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1100" viewBox="0 0 1900 1100">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6c6c6c"/>
+    </marker>
+    <style>
+      .title { font-family: Helvetica, Arial, sans-serif; font-size: 38px; font-weight: 700; fill: #111; text-anchor: middle; }
+      .subtitle { font-family: Helvetica, Arial, sans-serif; font-size: 22px; fill: #444; text-anchor: middle; }
+      .box { fill: #f6f6f6; stroke: #bdbdbd; stroke-width: 3; rx: 12; ry: 12; }
+      .label { font-family: Helvetica, Arial, sans-serif; font-size: 24px; fill: #111; text-anchor: middle; dominant-baseline: middle; }
+      .edge { stroke: #6c6c6c; stroke-width: 4; fill: none; }
+      .arrow { stroke: #6c6c6c; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .note { font-family: Helvetica, Arial, sans-serif; font-size: 20px; fill: #444; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <text x="950" y="60" class="title">Figure 8. PC Graph on the 8-Variable Union</text>
+  <text x="950" y="100" class="subtitle">Estimated CPDAG from the combined variable set used across Models A-E</text>
+
+  <rect class="box" x="90" y="130" width="330" height="130"/>
+  <text class="label" x="255" y="185">Isolated inertial</text>
+  <text class="label" x="255" y="225">injury</text>
+
+  <rect class="box" x="540" y="130" width="300" height="130"/>
+  <text class="label" x="690" y="205">Inertial injury</text>
+
+  <rect class="box" x="1040" y="130" width="360" height="130"/>
+  <text class="label" x="1220" y="185">Duration of altered</text>
+  <text class="label" x="1220" y="225">consciousness</text>
+
+  <rect class="box" x="1530" y="130" width="300" height="130"/>
+  <text class="label" x="1680" y="205">Severe retinal injury</text>
+
+  <rect class="box" x="580" y="500" width="300" height="130"/>
+  <text class="label" x="730" y="575">Diffuse HIE</text>
+
+  <rect class="box" x="1080" y="500" width="340" height="130"/>
+  <text class="label" x="1250" y="565">Clinical hypoxia</text>
+  <text class="label" x="1250" y="605">or ischemia</text>
+
+  <rect class="box" x="150" y="820" width="320" height="130"/>
+  <text class="label" x="310" y="895">Extra-axial blood</text>
+
+  <rect class="box" x="1530" y="820" width="220" height="130"/>
+  <text class="label" x="1640" y="895">Seizure</text>
+
+  <path class="arrow" d="M 420 195 C 470 195, 500 195, 540 195"/>
+  <path class="arrow" d="M 1040 220 C 960 220, 910 215, 840 210"/>
+  <path class="arrow" d="M 840 200 C 1180 200, 1360 200, 1530 195"/>
+  <path class="arrow" d="M 880 550 C 1200 500, 1380 360, 1530 215"/>
+  <path class="edge" d="M 880 555 C 960 470, 1020 380, 1120 260"/>
+  <path class="edge" d="M 1260 500 C 1250 420, 1240 350, 1230 260"/>
+
+  <text x="950" y="1010" class="note">PC retained six edges: isolated inertial injury → inertial injury, duration of altered consciousness → inertial injury,</text>
+  <text x="950" y="1042" class="note">inertial injury → severe retinal injury, diffuse HIE → severe retinal injury, and two unoriented links to duration of altered consciousness.</text>
+</svg>

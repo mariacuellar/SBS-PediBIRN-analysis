@@ -212,7 +212,7 @@ This table checks that the reconstructed variables behave plausibly in the ophth
 
 # Methods
 
-## Model A
+## Mediation Analysis Replication
 
 We now fit Model A, using isolated inertial injury as the exposure, diffuse HIE and extra-axial blood as mediators, and severe retinal injury as the outcome.
 
@@ -262,77 +262,6 @@ outcome_model <- glm(
 
 This approximation uses logistic regression for both mediators and the outcome, then summarizes indirect effects as products of the relevant log-odds coefficients.
 
-## FCI Search for Model A
-
-We now run a focused FCI search on the same four Model A variables as a data-driven alternative to the hand-specified mediation model. Unlike the mediation analysis, FCI allows for latent confounding and returns a partial ancestral graph rather than a fully committed DAG.
-
-The FCI algorithm is a causal discovery procedure that uses patterns of conditional independence in the observed data to learn a set of causal relationships that are compatible with the data while allowing for the possibility of unmeasured confounding. Rather than testing one prespecified mediation pathway, it searches over the observed variables and returns a partial ancestral graph, or PAG, which represents a class of causal graphs that fit the data under the algorithm's assumptions. The output can include directed edges, partially oriented edges, and edges with unresolved endpoints, so it usually identifies some causal features without committing to a single fully determined DAG. Its main assumptions are that the observed conditional independences arise from an underlying causal graph, that the data satisfy the Markov and faithfulness assumptions with respect to that graph, and that the conditional independence tests used by the algorithm are reliable for the sample at hand.
-
-```{r fci-model-a}
-library(pcalg)
-
-model_a_fci_data <- oph_subset |>
-  select(isolated_inertial_injury, diffuse_HIE, extra_axial_blood, severe_retinal_injury) |>
-  na.omit()
-
-fci_model_a <- fci(
-  suffStat = list(dm = as.matrix(model_a_fci_data), adaptDF = FALSE),
-  indepTest = binCItest,
-  alpha = 0.05,
-  labels = names(model_a_fci_data),
-  skel.method = "stable",
-  verbose = FALSE
-)
-
-fci_amat <- as(fci_model_a, "matrix")
-
-decode_pag_edge <- function(mark_ij, mark_ji) {
-  left_mark <- dplyr::case_when(
-    mark_ji == 1 ~ "o",
-    mark_ji == 2 ~ "<",
-    mark_ji == 3 ~ "-",
-    TRUE ~ " "
-  )
-  right_mark <- dplyr::case_when(
-    mark_ij == 1 ~ "o",
-    mark_ij == 2 ~ ">",
-    mark_ij == 3 ~ "-",
-    TRUE ~ " "
-  )
-  paste0(left_mark, "-", right_mark)
-}
-
-fci_edges_tbl <- bind_rows(lapply(seq_len(ncol(fci_amat) - 1), function(i) {
-  bind_rows(lapply(seq((i + 1), ncol(fci_amat)), function(j) {
-    mark_ij <- fci_amat[i, j]
-    mark_ji <- fci_amat[j, i]
-
-    if (mark_ij == 0 && mark_ji == 0) {
-      return(NULL)
-    }
-
-    tibble(
-      node_1 = colnames(fci_amat)[i],
-      node_2 = colnames(fci_amat)[j],
-      pag_edge = decode_pag_edge(mark_ij, mark_ji),
-      interpretation = case_when(
-        decode_pag_edge(mark_ij, mark_ji) == "o->" ~ "compatible with a directed edge into node_2, but with uncertainty at node_1",
-        decode_pag_edge(mark_ij, mark_ji) == "o-o" ~ "adjacent, but with unresolved orientation at both ends",
-        TRUE ~ "partially oriented PAG edge"
-      )
-    )
-  }))
-}))
-
-kable(fci_edges_tbl, caption = "Table 5. FCI edge summary for the Model A variable set")
-```
-
-Table 5 translates the FCI output into edge marks that are easier to read than the raw PAG adjacency matrix. In this subset, the FCI search preserves links from all three putative predictors to severe retinal injury, while also leaving some orientation uncertainty rather than endorsing the mediation model as a uniquely identified DAG.
-
-We now show the same FCI result as a simple partial ancestral graph for the Model A variable set.
-
-![FCI partial ancestral graph for the Model A variable set.](figures-mediation-analysis/modelA-fci-pag.svg)
-
 ## Models B-E
 
 We now extend the same approximation to four additional inferred models so the document covers the full A-E set discussed in the paper. Because the exact figure definitions were not recoverable from the shared materials, these model specifications should be read as transparent approximations rather than exact reproductions.
@@ -371,11 +300,13 @@ kable(model_specs_display, caption = "Table 2. Published Figure A-E specificatio
 
 This table makes the A-E assumptions explicit before the five models are fit and compared.
 
-## FCI-Based Comparison of Models A-E
+## FCI Model Search
 
-We now compare Models A-E using FCI in the way the algorithm is actually designed to be used. FCI does not produce a single global score for a hand-specified mediation DAG, so instead we compare each proposed model against the PAG estimated on that model's variable set and count how many expected arrows are strongly supported, only partially supported, absent, or contradicted.
+We now run FCI on the union of variables appearing anywhere in Models A-E, rather than fitting a separate FCI graph to each model. This gives one data-driven PAG over the combined variable set. The FCI algorithm is a causal discovery procedure that uses patterns of conditional independence in the observed data to learn a set of causal relationships that are compatible with the data while allowing for the possibility of unmeasured confounding. Its output is a partial ancestral graph, or PAG, which can include directed edges, partially oriented edges, and unresolved endpoints rather than a single fully determined DAG.
 
 ```{r fci-model-comparison}
+library(pcalg)
+
 get_pag_marks <- function(amat, from, to) {
   c(source_mark = amat[to, from], target_mark = amat[from, to])
 }
@@ -426,37 +357,32 @@ expected_model_edges <- bind_rows(lapply(seq_len(nrow(model_specs)), function(i)
   )
 }))
 
-fci_model_results <- lapply(seq_len(nrow(model_specs)), function(i) {
-  spec <- model_specs[i, ]
-  vars <- c(spec$exposure, spec$mediators[[1]], "severe_retinal_injury")
+fci_union_vars <- unique(c(
+  model_specs$exposure,
+  unlist(model_specs$mediators),
+  "severe_retinal_injury"
+))
 
-  dat <- oph_subset |>
-    select(all_of(vars)) |>
-    na.omit()
+fci_union_data <- oph_subset |>
+  select(all_of(fci_union_vars)) |>
+  na.omit()
 
-  fit <- fci(
-    suffStat = list(dm = as.matrix(dat), adaptDF = FALSE),
-    indepTest = disCItest,
-    alpha = 0.05,
-    labels = vars,
-    skel.method = "stable",
-    verbose = FALSE
-  )
+fci_union_fit <- fci(
+  suffStat = list(dm = as.matrix(fci_union_data), adaptDF = FALSE),
+  indepTest = disCItest,
+  alpha = 0.05,
+  labels = fci_union_vars,
+  skel.method = "stable",
+  verbose = FALSE
+)
 
-  list(
-    data = dat,
-    fit = fit,
-    amat = as(fit, "matrix")
-  )
-})
-
-names(fci_model_results) <- model_specs$model
+fci_union_amat <- as(fci_union_fit, "matrix")
 
 fci_edge_assessment_tbl <- expected_model_edges |>
   rowwise() |>
   mutate(
     fci_assessment = classify_expected_arrow(
-      amat = fci_model_results[[model]]$amat,
+      amat = fci_union_amat,
       from = from,
       to = to
     )
@@ -472,12 +398,8 @@ fci_model_summary_tbl <- fci_edge_assessment_tbl |>
   ) |>
   count(model, fci_assessment, .drop = FALSE) |>
   tidyr::pivot_wider(names_from = fci_assessment, values_from = n, values_fill = 0) |>
-  left_join(
-    tibble(
-      model = names(fci_model_results),
-      n_complete = vapply(fci_model_results, function(x) nrow(x$data), integer(1))
-    ),
-    by = "model"
+  mutate(
+    n_complete = nrow(fci_union_data)
   ) |>
   mutate(
     n_expected_edges = `strongly supported` + `partially supported` + absent + contradicted
@@ -486,11 +408,75 @@ fci_model_summary_tbl <- fci_edge_assessment_tbl |>
 
 kable(
   fci_model_summary_tbl,
-  caption = "Table 6. FCI-based compatibility summary for Models A-E"
+  caption = "Table 6. Compatibility of Models A-E with the union-of-variables FCI PAG"
 )
 ```
 
-Table 6 uses FCI in a model-comparison role without forcing it into a mediation-estimator framework it was not designed for. Under this criterion, Model A is the most compatible with the estimated PAG, with three strongly supported expected arrows, one partially supported arrow, and only one absent arrow. By contrast, Model B performs poorly because most of its expected arrows are absent from the FCI graph on this subset.
+Table 6 uses FCI in a model-comparison role without forcing it into a mediation-estimator framework it was not designed for. Because all five models are judged against the same union-of-variables PAG, this comparison is closer to asking which hand-specified model is most compatible with the broader causal structure learned from the combined variable set.
+
+## PC and GES Search
+
+We now fit the PC and GES algorithms on the same eight-variable union so that the FCI result can be compared against two other common causal discovery approaches. For PC, we use the same discrete conditional-independence testing strategy as in the FCI search. For GES, the `pcalg` implementation available locally relies on a Gaussian score, so the GES run here should be read as an approximate score-based search on the numeric-coded variables rather than as an exact method for mixed discrete data.
+
+```{r pc-ges-search}
+pc_fit <- pc(
+  suffStat = list(dm = as.matrix(fci_union_data), adaptDF = FALSE),
+  indepTest = disCItest,
+  alpha = 0.05,
+  labels = fci_union_vars,
+  skel.method = "stable",
+  verbose = FALSE
+)
+
+pc_amat <- as(pc_fit, "matrix")
+
+decode_cpdag_edge <- function(mark_ij, mark_ji) {
+  case_when(
+    mark_ij == 1 && mark_ji == 0 ~ "<--",
+    mark_ij == 0 && mark_ji == 1 ~ "-->",
+    mark_ij == 1 && mark_ji == 1 ~ "---",
+    TRUE ~ "   "
+  )
+}
+
+pc_edges_tbl <- bind_rows(lapply(seq_len(ncol(pc_amat) - 1), function(i) {
+  bind_rows(lapply(seq((i + 1), ncol(pc_amat)), function(j) {
+    mark_ij <- pc_amat[i, j]
+    mark_ji <- pc_amat[j, i]
+
+    if (mark_ij == 0 && mark_ji == 0) {
+      return(NULL)
+    }
+
+    tibble(
+      node_1 = colnames(pc_amat)[i],
+      node_2 = colnames(pc_amat)[j],
+      edge = decode_cpdag_edge(mark_ij, mark_ji)
+    )
+  }))
+}))
+
+ges_score <- new("GaussL0penObsScore", data = as.matrix(fci_union_data))
+ges_fit <- ges(ges_score)
+ges_amat <- as(ges_fit$essgraph, "matrix")
+
+ges_edges_tbl <- bind_rows(lapply(seq_len(ncol(ges_amat) - 1), function(i) {
+  bind_rows(lapply(seq((i + 1), ncol(ges_amat)), function(j) {
+    mark_ij <- ges_amat[i, j]
+    mark_ji <- ges_amat[j, i]
+
+    if (mark_ij == 0 && mark_ji == 0) {
+      return(NULL)
+    }
+
+    tibble(
+      node_1 = colnames(ges_amat)[i],
+      node_2 = colnames(ges_amat)[j],
+      edge = decode_cpdag_edge(mark_ij, mark_ji)
+    )
+  }))
+}))
+```
 
 ## Bootstrap Estimation
 
@@ -619,7 +605,9 @@ This table is the main model-comparison target. The estimates are in log-odds un
 
 # Results
 
-## Model Comparison
+## Mediation Analysis Replication Results
+
+### Model Comparison
 
 We now compare the direct and indirect effects across Models A-E to see which inferred causal structure is most explanatory in this subset.
 
@@ -643,7 +631,7 @@ ggplot(effect_plot_tbl, aes(x = model, y = estimate, fill = effect_type)) +
 
 This figure helps show whether Model A remains the strongest specification in the subset, or whether one of the other published figure structures captures more of the retinal-injury signal.
 
-## Comparison With Boos et al.
+### Comparison With Boos et al.
 
 We now compare our subset-based estimates with the published coefficients shown in Figures A-E. This lets us see, model by model, whether the subset reproduces the overall pattern of direct and mediated effects even if the numerical values are not identical.
 
@@ -755,7 +743,9 @@ ggplot(boos_vs_subset_plot_tbl, aes(x = model, y = estimate, fill = source)) +
 
 This figure helps show whether the subset-based replication preserves the broad ranking and scale of the published direct and total effects, even when the exact values differ.
 
-## Model A Outcome-Model Coefficients
+Model B stands out because the subset-based replication produces a much larger direct and total effect than the published Boos figure. In this case, the most likely explanation is model instability rather than a substantively larger effect in the subset. When the Model B outcome regression was examined directly, the coefficient for `inertial_injury` was extremely large (`17.743`) and was paired with an extremely large standard error (`808.473`), which is a classic sign of quasi-separation or near-separation in logistic regression. In other words, the Model B regression appears to be behaving as though `inertial_injury` almost perfectly separates patients with and without severe retinal injury in this subset, which makes the fitted direct effect unstable and artificially large. The other Model B coefficients were far more ordinary in size and precision, so the inflation appears to be concentrated in the direct-effect term rather than spread across the whole model. For that reason, the large Model B bar in the replication should be interpreted as evidence of instability in the subset fit, not as evidence that the corresponding causal effect is truly much larger than in the published paper.
+
+### Model A Outcome-Model Coefficients
 
 We now display the fitted Model A outcome coefficients so it is clear which variables are driving the direct and mediated paths in the closest paper-match specification.
 
@@ -774,7 +764,7 @@ kable(outcome_coef_tbl, digits = 3, caption = "Table 5. Model A outcome-model co
 
 This table is helpful because it separates the direct effect of isolated inertial injury from the associations of the two mediators with severe retinal injury.
 
-## Effect Plot
+### Effect Plot
 
 We now plot the Model A direct and indirect effects to make the relative sizes easier to compare visually.
 
@@ -811,13 +801,13 @@ ggplot(effect_tbl_model_a, aes(x = effect, y = estimate)) +
 
 This figure helps show whether Model A is being driven mainly by the direct path from isolated inertial injury to severe retinal injury, or by the indirect paths through diffuse HIE and extra-axial blood.
 
-## Recreated Figure 1
+### Recreated Figure 1
 
 We now recreate the first Boos 2025 mediation figure using the subset-based Model A estimates from this replication.
 
 ![Recreated Figure 1 using subset-based Model A estimates.](figures-mediation-analysis/boos2025-figure1-modelA-replication.svg)
 
-## Recreated Figures 2-5
+### Recreated Figures 2-5
 
 We now show parallel diagram recreations for Models B-E using the same visual style as the Model A replication figure. These panels make it easier to compare the structure and relative path magnitudes across the five published mediation models.
 
@@ -828,6 +818,18 @@ We now show parallel diagram recreations for Models B-E using the same visual st
 ![Recreated Figure 4 using subset-based Model D estimates.](figures-mediation-analysis/boos2025-figure4-modelD-replication.svg)
 
 ![Recreated Figure 5 using subset-based Model E estimates.](figures-mediation-analysis/boos2025-figure5-modelE-replication.svg)
+
+## FCI Model Search Results
+
+We next summarize the FCI search on the eight-variable union drawn from Models A-E: `isolated_inertial_injury`, `inertial_injury`, `diffuse_HIE`, `clinical_hypoxia_ischemia`, `duration_altered_consciousness`, `extra_axial_blood`, `seizure`, and `severe_retinal_injury`. Using the 312 complete cases available on that combined variable set, the estimated PAG was very sparse. The algorithm retained only two adjacencies: `isolated_inertial_injury o-o inertial_injury` and `diffuse_HIE o-o severe_retinal_injury`. No other edges were retained. This means that, in this subset, the broader FCI search did not recover a rich causal graph resembling any of the hand-specified mediation models. A practical limitation is that the discrete conditional-independence testing produced warnings that the sample size was too small for some of the higher-dimensional tests, and those cases were treated as independence, so this eight-variable PAG should be interpreted cautiously as an underpowered exploratory result rather than a definitive causal model.
+
+![Estimated PAG from FCI on the 8-variable union.](figures-mediation-analysis/fci-union-8vars.svg)
+
+## PC and GES Results
+
+We next compare the corresponding PC and GES searches on the same eight-variable union. The PC algorithm returned a small non-empty graph, retaining the edges `isolated_inertial_injury --> inertial_injury`, `inertial_injury --> severe_retinal_injury`, `duration_altered_consciousness --> inertial_injury`, `diffuse_HIE --> severe_retinal_injury`, and two unoriented adjacencies involving `duration_altered_consciousness`, namely `diffuse_HIE --- duration_altered_consciousness` and `clinical_hypoxia_ischemia --- duration_altered_consciousness`. By contrast, the GES run returned an empty graph under the available Gaussian score approximation. Taken together, these results suggest that the eight-variable causal search is highly sensitive to algorithm choice in this subset, with FCI returning a very sparse PAG, PC retaining a small directed graph, and GES finding no edges at all.
+
+![Estimated graph from PC on the 8-variable union.](figures-mediation-analysis/pc-union-8vars.svg)
 
 # Discussion
 
