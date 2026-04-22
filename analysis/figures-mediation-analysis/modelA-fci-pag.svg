@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .title { font-family: Helvetica, Arial, sans-serif; font-size: 38px; font-weight: 700; fill: #111; text-anchor: middle; }
+      .subtitle { font-family: Helvetica, Arial, sans-serif; font-size: 22px; fill: #444; text-anchor: middle; }
+      .box { fill: #f4f4f4; stroke: #b8b8b8; stroke-width: 3; rx: 10; ry: 10; }
+      .label { font-family: Helvetica, Arial, sans-serif; font-size: 28px; fill: #111; text-anchor: middle; dominant-baseline: middle; }
+      .edge { stroke: #6f6f6f; stroke-width: 4; fill: none; }
+      .mark { font-family: Helvetica, Arial, sans-serif; font-size: 34px; font-weight: 700; fill: #555; text-anchor: middle; dominant-baseline: middle; }
+      .note { font-family: Helvetica, Arial, sans-serif; font-size: 21px; fill: #444; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <text x="800" y="70" class="title">Figure 6. FCI Search on the Model A Variable Set</text>
+  <text x="800" y="112" class="subtitle">Partial ancestral graph estimated from the four Model A variables</text>
+
+  <rect class="box" x="90" y="365" width="360" height="170"/>
+  <text class="label" x="270" y="430">Isolated inertial</text>
+  <text class="label" x="270" y="478">injury</text>
+
+  <rect class="box" x="610" y="150" width="320" height="140"/>
+  <text class="label" x="770" y="220">Diffuse HIE</text>
+
+  <rect class="box" x="610" y="610" width="320" height="140"/>
+  <text class="label" x="770" y="680">Extra-axial blood</text>
+
+  <rect class="box" x="1160" y="365" width="360" height="170"/>
+  <text class="label" x="1340" y="430">Severe retinal</text>
+  <text class="label" x="1340" y="478">injury</text>
+
+  <path class="edge" d="M 450 430 C 700 430, 910 430, 1160 430"/>
+  <text class="mark" x="500" y="410">o</text>
+  <text class="mark" x="1110" y="410">&gt;</text>
+
+  <path class="edge" d="M 930 220 C 1030 255, 1090 320, 1160 398"/>
+  <text class="mark" x="960" y="230">o</text>
+  <text class="mark" x="1120" y="360">&gt;</text>
+
+  <path class="edge" d="M 930 680 C 1030 645, 1090 580, 1160 502"/>
+  <text class="mark" x="960" y="670">o</text>
+  <text class="mark" x="1120" y="540">&gt;</text>
+
+  <path class="edge" d="M 450 500 C 530 570, 560 600, 610 635"/>
+  <text class="mark" x="490" y="535">o</text>
+  <text class="mark" x="580" y="610">o</text>
+
+  <text x="800" y="835" class="note">FCI result: isolated inertial injury o→ severe retinal injury, diffuse HIE o→ severe retinal injury,</text>
+  <text x="800" y="865" class="note">extra-axial blood o→ severe retinal injury, and isolated inertial injury o—o extra-axial blood.</text>
+</svg>
